@@ -206,7 +206,7 @@
           </button>
         </div>
 
-        <!-- FIRMA DEL TÉCNICO (SIRVE PARA FIRMAR LOS PENDIENTES) -->
+        <!-- FIRMA DEL TÉCNICO -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border-2 border-[#f25c19] space-y-2">
           <div class="flex justify-between text-xs font-black text-[#0b2254]">
             <span>Tu Firma Digital (Técnico PRL):</span>
@@ -432,7 +432,7 @@
       const tecnicoNombre = tecObj ? tecObj.nombre : tecUsuario;
 
       btnEnviar.disabled = true;
-      btnEnviar.textContent = "⏳ Enviando notificación al Técnico PRL...";
+      btnEnviar.textContent = "⏳ Registrando y enviando correo al Técnico PRL...";
 
       const payload = {
         action: "registrar_pendiente",
@@ -451,24 +451,32 @@
       };
 
       try {
-        await fetch(SCRIPT_URL, {
+        const res = await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
         });
+        const respData = await res.json();
 
-        btnEnviar.classList.add("hidden");
-        document.getElementById("btn-reintentar-test").classList.add("hidden");
-        box.className = "p-4 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-950 border-2 border-emerald-500 space-y-2";
-        box.innerHTML = `
-          <div class="text-sm font-black">✅ EXAMEN APTO (${aciertos} / 10 aciertos)</div>
-          <p>Se ha enviado un correo electrónico a <strong>${tecnicoNombre}</strong> para que estampe su firma y el documento quede registrado en Drive.</p>
-        `;
-        box.classList.remove("hidden");
-        document.getElementById("btn-siguiente-trabajador").classList.remove("hidden");
+        if (respData.status === "ok") {
+          btnEnviar.classList.add("hidden");
+          document.getElementById("btn-reintentar-test").classList.add("hidden");
+          box.className = "p-4 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-950 border-2 border-emerald-500 space-y-2";
+          box.innerHTML = `
+            <div class="text-sm font-black">✅ EXAMEN APTO (${aciertos} / 10 aciertos)</div>
+            <p>${respData.emailEnviado
+              ? `Se ha enviado un correo electrónico a <strong>${tecnicoNombre}</strong> para que estampe su firma y archive el PDF en Drive.`
+              : `Registrado como pendiente para <strong>${tecnicoNombre}</strong> (nota: este usuario no tiene email configurado en la columna D de USUARIOS).`}</p>
+          `;
+          box.classList.remove("hidden");
+          document.getElementById("btn-siguiente-trabajador").classList.remove("hidden");
+        } else {
+          throw new Error(respData.message || "Error en el servidor.");
+        }
       } catch (e) {
-        alert("Error de red al enviar el examen. Inténtalo de nuevo.");
+        box.className = "p-4 rounded-xl text-xs font-bold text-center bg-rose-100 text-rose-950 border border-rose-400";
+        box.textContent = "Error al enviar: " + e.message;
+        box.classList.remove("hidden");
         btnEnviar.disabled = false;
         btnEnviar.textContent = "✅ Finalizar y Enviar Examen";
       }
