@@ -35,7 +35,6 @@
         </div>
       </div>
 
-      <!-- BOTÓN LIMPIO DE ACCESO PARA EL TÉCNICO PRL -->
       <button type="button" id="btn-modo-tecnico" onclick="alternarVistaTecnico()" class="text-[10px] font-black px-3.5 py-1.5 rounded-full bg-[#f25c19] hover:bg-[#d94d0e] text-white uppercase shadow transition">
         Área Técnico PRL
       </button>
@@ -55,7 +54,7 @@
         <div id="tab-paso-2" class="py-2 px-3 rounded-xl bg-slate-100 text-slate-400">2. Test de Examen</div>
       </div>
 
-      <!-- PASO 1: DATOS DEL TRABAJADOR Y TÉCNICO QUE IMPARTE -->
+      <!-- PASO 1: TEMARIO COMPLETO + DATOS DEL TRABAJADOR -->
       <div id="bloque-fase-1" class="space-y-4">
 
         <section class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
@@ -63,11 +62,16 @@
             <span>Temario de Inducción Impartido</span>
             <span class="text-[10px] text-amber-400">FI.ELN.GEN-04.01B</span>
           </div>
-          <div class="p-4 text-[11px] text-slate-700 space-y-1.5 leading-relaxed">
-            <p>Formación PRL en el puesto de trabajo (<strong>Art. 19 Ley 31/95</strong>) para el proyecto <strong id="texto-proyecto-banner">FV HYBRID GECAMA</strong>:</p>
-            <p>• <strong>Normas HSE:</strong> Uso móvil, prohibido fumar, botiquín, extinción, drogas/alcohol, control de accesos.</p>
-            <p>• <strong>Riesgos y Seguridad:</strong> Líneas aéreas, EPIs, protecciones colectivas, distancia maquinaria, izados, cargas y equipos con marcado CE.</p>
-            <p>• <strong>Emergencias y Salud:</strong> Plan de emergencia (PAS), golpe de calor, productos químicos y charla pre-tarea.</p>
+          <div class="p-4 text-[11px] text-slate-700 space-y-2 leading-relaxed">
+            <p>Formación en materia de prevención de riesgos laborales en el puesto de trabajo tal y como se establece en el <strong>art. 19 de la Ley 31/95 de prevención de riesgos laborales</strong> para el proyecto <strong id="texto-proyecto-banner">FV HYBRID GECAMA</strong>:</p>
+            <p>• <strong>Normas generales HSE en el proyecto:</strong> Uso móvil, prohibido fumar, botiquín, medios de extinción, prohibido consumo de drogas y alcohol, control de accesos.</p>
+            <p>• <strong>Interferencia líneas aéreas:</strong> Trabajos próximos tensión, cruces, riesgos.</p>
+            <p>• <strong>Plan de Seguridad y Salud:</strong> Equipos de protección individual, protecciones colectivas, señalización, procedimientos de trabajo específico: distancia seguridad respecto a maquinaria, izados, cargas y descargas de material, movimiento de tierras, montaje de estructura, manipulación de cargas, etc.</p>
+            <p>• <strong>Equipos de trabajo:</strong> Marcado CE, grupos electrógenos, prohibido escaleras, alargaderas, herramientas en buen estado.</p>
+            <p>• <strong>Plan de Emergencia:</strong> Tipos de emergencia, accidentes e incidentes, respuesta y comunicación de emergencias. Números de emergencia, PAS, suspensión de trabajos.</p>
+            <p>• <strong>Otros:</strong> Golpe de Calor, manipulación de productos químicos.</p>
+            <p>• <strong>Seguimiento:</strong> Charla pre-tarea y checklist de maquinaria, charlas formación e información semanales.</p>
+            <p class="pt-1 border-t border-slate-200 font-bold text-[#0b2254]">Duración total de la sesión: 1 Hora</p>
           </div>
         </section>
 
@@ -257,7 +261,6 @@
     let listaTecnicosCache = [];
     let pendientesActuales = [];
 
-    // --- CARGA INICIAL DE TÉCNICOS Y EMPRESAS (SIN MOSTRAR CONTADORES PÚBLICOS) ---
     async function cargarDatosIniciales() {
       renderizarSelectEmpresas([]);
       try {
@@ -320,7 +323,6 @@
       return sel.trim().toUpperCase();
     }
 
-    // --- CANVAS DE FIRMA ---
     function inicializarCanvas(id) {
       const c = document.getElementById(id);
       if (!c) return;
@@ -355,7 +357,6 @@
       if (canvasEstado[id]) canvasEstado[id].firmado = false;
     }
 
-    // --- FLUJO DEL TRABAJADOR ---
     function renderizarPreguntasTest() {
       document.getElementById("contenedor-preguntas-test").innerHTML = PREGUNTAS_TEST.map((p, idx) => `
         <div class="py-3.5 space-y-2">
@@ -504,7 +505,7 @@
       volverAlActa();
     }
 
-    // --- ÁREA DEL TÉCNICO PRL (SOLO SUS EXÁMENES ASIGNADOS) ---
+    // --- ÁREA DEL TÉCNICO PRL ---
     function alternarVistaTecnico() {
       document.getElementById("vista-trabajador").classList.add("hidden");
       document.getElementById("vista-tecnico").classList.remove("hidden");
@@ -549,7 +550,6 @@
           document.getElementById("nombre-tecnico-conectado").textContent = data.nombreTecnico;
           document.getElementById("progreso-firma-masiva").classList.add("hidden");
 
-          // Doble filtro de seguridad: solo los exámenes asignados a este usuario técnico
           pendientesActuales = (data.pendientes || [])
             .filter(p => p.tecnicoUsuario === usuario)
             .map(p => ({ ...p, firmadoYa: false }));
@@ -612,7 +612,6 @@
         .replace(/^_+|_+$/g, "");
     }
 
-    // --- GENERACIÓN Y SUBIDA DE UN PDF UNIFICADO (PÁG 1: ACTA | PÁG 2: TEST) ---
     async function procesarYSubirUnTrabajador(idx, imgFirmaTecnico) {
       const item = pendientesActuales[idx];
       if (!item || item.firmadoYa) return;
@@ -879,7 +878,6 @@
       }
     }
 
-    // --- INICIO ---
     const hoy = new Date();
     document.getElementById("ind-fecha").value = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
     renderizarPreguntasTest();
