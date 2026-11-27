@@ -34,8 +34,11 @@
           <h1 class="font-black text-sm leading-tight uppercase">Inducción y Test Acceso</h1>
         </div>
       </div>
-      <button type="button" id="btn-modo-tecnico" onclick="alternarVistaTecnico()" class="text-[10px] font-black px-3 py-1.5 rounded-full bg-[#f25c19] hover:bg-[#d94d0e] text-white uppercase shadow transition">
-        Área Técnico PRL
+
+      <!-- BOTÓN ÁREA TÉCNICO CON AVISO DE PENDIENTES -->
+      <button type="button" id="btn-modo-tecnico" onclick="alternarVistaTecnico()" class="relative text-[10px] font-black px-3 py-1.5 rounded-full bg-[#f25c19] hover:bg-[#d94d0e] text-white uppercase shadow transition flex items-center gap-1.5">
+        <span>Área Técnico PRL</span>
+        <span id="badge-avisos-pendientes" class="hidden bg-rose-600 text-white border border-white text-[10px] font-black px-1.5 py-0.2 rounded-full animate-pulse">0</span>
       </button>
     </div>
   </header>
@@ -165,17 +168,17 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- VISTA B: ÁREA TÉCNICO PRL (VALIDACIÓN Y FIRMA DE PDF)     -->
+    <!-- VISTA B: ÁREA TÉCNICO PRL (AVISOS Y FIRMA MASIVA)         -->
     <!-- ========================================================= -->
     <div id="vista-tecnico" class="hidden space-y-4">
 
       <!-- LOGIN DEL TÉCNICO -->
       <section id="panel-login-tecnico" class="bg-white rounded-2xl shadow-xl p-5 border-t-4 border-[#f25c19] space-y-4">
         <div class="flex justify-between items-center">
-          <h2 class="text-base font-black text-[#0b2254] uppercase">Validación Técnico PRL</h2>
-          <button type="button" onclick="volverAVistaTrabajador()" class="text-xs font-bold text-slate-500 underline">Cerrar</button>
+          <h2 class="text-base font-black text-[#0b2254] uppercase">Acceso Técnico PRL</h2>
+          <button type="button" onclick="volverAVistaTrabajador()" class="text-xs font-bold text-slate-500 underline">Volver</button>
         </div>
-        <p class="text-xs text-slate-600">Introduce tu usuario y contraseña para firmar las inducciones pendientes y archivarlas en Google Drive.</p>
+        <p class="text-xs text-slate-600">Inicia sesión con tu usuario para ver tus avisos pendientes y firmar todos los trabajadores APTOS de golpe.</p>
 
         <div class="space-y-3 text-xs">
           <div>
@@ -189,12 +192,12 @@
         </div>
 
         <button type="button" id="btn-login-tec" onclick="loginTecnicoPRL()" class="w-full bg-[#0b2254] text-white font-black py-3.5 rounded-xl text-xs uppercase shadow-lg">
-          Acceder a Pendientes de Firma
+          Ver Avisos Pendientes de Firma
         </button>
         <p id="tec-login-error" class="hidden text-xs font-bold text-rose-600 text-center"></p>
       </section>
 
-      <!-- BANDEJA DE PENDIENTES Y FIRMA DEL TÉCNICO -->
+      <!-- BANDEJA DE PENDIENTES Y FIRMA MASIVA DEL TÉCNICO -->
       <section id="panel-bandeja-tecnico" class="hidden space-y-4">
         <div class="bg-[#0b2254] text-white p-4 rounded-2xl flex justify-between items-center">
           <div>
@@ -202,18 +205,24 @@
             <p id="nombre-tecnico-conectado" class="font-black text-sm"></p>
           </div>
           <button type="button" onclick="volverAVistaTrabajador()" class="bg-slate-700 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase">
-            Salir Área Técnico
+            Salir
           </button>
         </div>
 
-        <!-- FIRMA DEL TÉCNICO -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border-2 border-[#f25c19] space-y-2">
+        <!-- RECUADRO DE FIRMA ÚNICA PARA APLICAR A TODOS -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border-2 border-[#f25c19] space-y-3">
           <div class="flex justify-between text-xs font-black text-[#0b2254]">
             <span>Tu Firma Digital (Técnico PRL):</span>
             <button type="button" onclick="limpiarCanvas('canvas-firma-tecnico')" class="text-rose-600 underline text-[11px]">Borrar</button>
           </div>
           <canvas id="canvas-firma-tecnico" class="w-full h-28 border-2 border-dashed border-slate-400 rounded-lg bg-slate-50 touch-canvas"></canvas>
-          <p class="text-[10px] text-slate-500">Estampa tu firma arriba y pulsa <strong>"Firmar y Archivar PDF Único en Drive"</strong> en cada trabajador aprobado.</p>
+
+          <!-- BOTÓN DE FIRMA MASIVA PARA TODOS LOS APTOS -->
+          <button type="button" id="btn-firmar-todos-golpe" onclick="firmarTodosDeGolpe()" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-xl text-xs uppercase tracking-wide shadow-lg transition">
+            ✍️ Firmar y Archivar TODOS de Golpe (0)
+          </button>
+
+          <div id="progreso-firma-masiva" class="hidden p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-950 text-xs font-bold text-center"></div>
         </div>
 
         <div id="lista-pendientes-tecnico" class="space-y-3"></div>
@@ -249,9 +258,9 @@
     const canvasEstado = {};
     let listaTecnicosCache = [];
     let pendientesActuales = [];
-    let idRegistroEnlaceCorreo = new URLSearchParams(window.location.search).get("firmar") || "";
+    let pendientesPorTecnicoMap = {};
 
-    // --- CARGA INICIAL DE TÉCNICOS Y EMPRESAS ---
+    // --- CARGA INICIAL DE TÉCNICOS, EMPRESAS Y AVISOS PENDIENTES ---
     async function cargarDatosIniciales() {
       renderizarSelectEmpresas([]);
       try {
@@ -262,19 +271,32 @@
             localStorage.setItem("elecnor_ind_empresas", JSON.stringify(data.empresas));
             renderizarSelectEmpresas(data.empresas);
           }
+          pendientesPorTecnicoMap = data.pendientesPorTecnico || {};
+          actualizarBadgeAvisos(data.totalPendientes || 0);
+
           if (Array.isArray(data.tecnicos)) {
             listaTecnicosCache = data.tecnicos;
             const selTec = document.getElementById("select-tecnico-prl");
             selTec.innerHTML = [
               `<option value="">-- Selecciona Técnico PRL --</option>`,
-              ...data.tecnicos.map(t => `<option value="${t.usuario}">${t.nombre}</option>`)
+              ...data.tecnicos.map(t => {
+                const nPend = pendientesPorTecnicoMap[t.usuario] || 0;
+                const etiqueta = nPend > 0 ? `${t.nombre} (${nPend} pendiente${nPend > 1 ? 's' : ''})` : t.nombre;
+                return `<option value="${t.usuario}">${etiqueta}</option>`;
+              })
             ].join("");
           }
         }
       } catch (e) {}
+    }
 
-      if (idRegistroEnlaceCorreo) {
-        alternarVistaTecnico();
+    function actualizarBadgeAvisos(total) {
+      const badge = document.getElementById("badge-avisos-pendientes");
+      if (total > 0) {
+        badge.textContent = total;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
       }
     }
 
@@ -432,7 +454,7 @@
       const tecnicoNombre = tecObj ? tecObj.nombre : tecUsuario;
 
       btnEnviar.disabled = true;
-      btnEnviar.textContent = "⏳ Registrando y enviando correo al Técnico PRL...";
+      btnEnviar.textContent = "⏳ Registrando aviso para el Técnico PRL...";
 
       const payload = {
         action: "registrar_pendiente",
@@ -446,8 +468,7 @@
         respuestas: respuestas,
         firmaTrabajador: document.getElementById("canvas-trabajador").toDataURL("image/png"),
         tecnicoUsuario: tecUsuario,
-        tecnicoNombre: tecnicoNombre,
-        appUrl: window.location.origin + window.location.pathname
+        tecnicoNombre: tecnicoNombre
       };
 
       try {
@@ -464,14 +485,13 @@
           box.className = "p-4 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-950 border-2 border-emerald-500 space-y-2";
           box.innerHTML = `
             <div class="text-sm font-black">✅ EXAMEN APTO (${aciertos} / 10 aciertos)</div>
-            <p>${respData.emailEnviado
-              ? `Se ha enviado un correo electrónico a <strong>${tecnicoNombre}</strong> para que estampe su firma y archive el PDF en Drive.`
-              : `Registrado como pendiente para <strong>${tecnicoNombre}</strong> (nota: este usuario no tiene email configurado en la columna D de USUARIOS).`}</p>
+            <p>Tu inducción ha quedado registrada y enviada a la bandeja de firma de <strong>${tecnicoNombre}</strong>.</p>
           `;
           box.classList.remove("hidden");
           document.getElementById("btn-siguiente-trabajador").classList.remove("hidden");
+          cargarDatosIniciales();
         } else {
-          throw new Error(respData.message || "Error en el servidor.");
+          throw new Error(respData.message || "Error al guardar.");
         }
       } catch (e) {
         box.className = "p-4 rounded-xl text-xs font-bold text-center bg-rose-100 text-rose-950 border border-rose-400";
@@ -505,7 +525,7 @@
       volverAlActa();
     }
 
-    // --- ÁREA DEL TÉCNICO PRL (LOGIN + FIRMA DEL PDF UNIFICADO) ---
+    // --- ÁREA DEL TÉCNICO PRL (BANDEJA DE AVISOS Y FIRMA MASIVA) ---
     function alternarVistaTecnico() {
       document.getElementById("vista-trabajador").classList.add("hidden");
       document.getElementById("vista-tecnico").classList.remove("hidden");
@@ -514,6 +534,7 @@
     function volverAVistaTrabajador() {
       document.getElementById("vista-tecnico").classList.add("hidden");
       document.getElementById("vista-trabajador").classList.remove("hidden");
+      cargarDatosIniciales();
     }
 
     async function loginTecnicoPRL() {
@@ -524,7 +545,7 @@
 
       if (!usuario || !password) return;
       btn.disabled = true;
-      btn.textContent = "Verificando...";
+      btn.textContent = "Cargando avisos...";
       err.classList.add("hidden");
 
       try {
@@ -539,12 +560,12 @@
           document.getElementById("panel-login-tecnico").classList.add("hidden");
           document.getElementById("panel-bandeja-tecnico").classList.remove("hidden");
           document.getElementById("nombre-tecnico-conectado").textContent = data.nombreTecnico;
-          pendientesActuales = data.pendientes || [];
+          pendientesActuales = (data.pendientes || []).map(p => ({ ...p, firmadoYa: false }));
 
           setTimeout(() => inicializarCanvas("canvas-firma-tecnico"), 100);
           renderizarBandejaPendientes();
         } else {
-          err.textContent = data.message || "Credenciales incorrectas.";
+          err.textContent = data.message || "Usuario o contraseña incorrectos.";
           err.classList.remove("hidden");
         }
       } catch (e) {
@@ -552,35 +573,42 @@
         err.classList.remove("hidden");
       } finally {
         btn.disabled = false;
-        btn.textContent = "Acceder a Pendientes de Firma";
+        btn.textContent = "Ver Avisos Pendientes de Firma";
       }
     }
 
     function renderizarBandejaPendientes() {
       const cont = document.getElementById("lista-pendientes-tecnico");
+      const btnTodos = document.getElementById("btn-firmar-todos-golpe");
+      const sinFirmar = pendientesActuales.filter(p => !p.firmadoYa);
+
+      if (sinFirmar.length > 0) {
+        btnTodos.textContent = `✍️ Firmar y Archivar TODOS de Golpe (${sinFirmar.length} pendiente${sinFirmar.length > 1 ? 's' : ''})`;
+        btnTodos.classList.remove("hidden");
+      } else {
+        btnTodos.classList.add("hidden");
+      }
+
       if (pendientesActuales.length === 0) {
-        cont.innerHTML = `<div class="bg-white p-5 rounded-2xl text-center text-xs font-bold text-slate-500">No tienes inducciones pendientes de firma en este momento.</div>`;
+        cont.innerHTML = `<div class="bg-white p-5 rounded-2xl text-center text-xs font-bold text-slate-500">No tienes trabajadores APTOS pendientes de firma.</div>`;
         return;
       }
 
-      cont.innerHTML = pendientesActuales.map((item, idx) => {
-        const destacado = item.idRegistro === idRegistroEnlaceCorreo ? "border-2 border-emerald-500 bg-emerald-50/40" : "border border-slate-200 bg-white";
-        return `
-          <div id="card-pendiente-${idx}" class="${destacado} p-4 rounded-2xl shadow-sm space-y-2.5 text-xs">
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase">APTO (${item.aciertos}/10)</span>
-                <h3 class="font-black text-sm text-slate-900 mt-1">${item.trabajador}</h3>
-                <p class="text-[11px] text-slate-600">DNI: <strong>${item.dni}</strong> • Puesto: <strong>${item.puesto}</strong></p>
-                <p class="text-[11px] text-slate-600">Empresa: <strong>${item.empresa}</strong> • Fecha: ${item.fecha}</p>
-              </div>
+      cont.innerHTML = pendientesActuales.map((item, idx) => `
+        <div id="card-pendiente-${idx}" class="border border-slate-200 bg-white p-4 rounded-2xl shadow-sm space-y-2.5 text-xs">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase">APTO (${item.aciertos}/10)</span>
+              <h3 class="font-black text-sm text-slate-900 mt-1">${item.trabajador}</h3>
+              <p class="text-[11px] text-slate-600">DNI: <strong>${item.dni}</strong> • Puesto: <strong>${item.puesto}</strong></p>
+              <p class="text-[11px] text-slate-600">Empresa: <strong>${item.empresa}</strong> • Fecha: ${item.fecha}</p>
             </div>
-            <button type="button" id="btn-firmar-item-${idx}" onclick="firmarYGenerarPDFUnico(${idx})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs uppercase shadow">
-              ✍️ Firmar y Archivar PDF Único en Drive
-            </button>
           </div>
-        `;
-      }).join("");
+          <button type="button" id="btn-firmar-item-${idx}" onclick="firmarIndividual(${idx})" class="w-full bg-[#0b2254] hover:bg-[#0f172a] text-white font-black py-2.5 rounded-xl text-[11px] uppercase">
+            ✍️ Firmar Solo Este Trabajador
+          </button>
+        </div>
+      `).join("");
     }
 
     function limpiarTextoArchivo(str) {
@@ -591,17 +619,10 @@
         .replace(/^_+|_+$/g, "");
     }
 
-    // --- GENERACIÓN DE UN ÚNICO PDF DE 2 PÁGINAS (PÁG 1: ACTA | PÁG 2: TEST) ---
-    async function firmarYGenerarPDFUnico(idx) {
-      if (!canvasEstado["canvas-firma-tecnico"]?.firmado) {
-        return alert("Por favor, estampa primero tu firma en el recuadro superior antes de validar al trabajador.");
-      }
-
+    // --- GENERACIÓN Y SUBIDA DE UN PDF UNIFICADO (PÁG 1: ACTA | PÁG 2: TEST) ---
+    async function procesarYSubirUnTrabajador(idx, imgFirmaTecnico) {
       const item = pendientesActuales[idx];
-      const imgFirmaTecnico = document.getElementById("canvas-firma-tecnico").toDataURL("image/png");
-      const btn = document.getElementById(`btn-firmar-item-${idx}`);
-      btn.disabled = true;
-      btn.textContent = "⏳ Generando PDF unificado y subiendo a Drive...";
+      if (!item || item.firmadoYa) return;
 
       const filasTestHTML = PREGUNTAS_TEST.map((p, i) => `
         <tr>
@@ -768,45 +789,103 @@
 
       const wrapper = document.getElementById("wrapper-pdf-unico");
       wrapper.style.display = "block";
-
       const nombreArchivo = `${item.fecha}_${limpiarTextoArchivo(item.empresa)}_${limpiarTextoArchivo(item.trabajador)}_INDUCCION_Y_TEST.pdf`;
 
-      try {
-        await new Promise(r => setTimeout(r, 150));
+      await new Promise(r => setTimeout(r, 120));
 
-        const opt = {
-          margin: 4,
-          filename: nombreArchivo,
-          image: { type: "jpeg", quality: 0.96 },
-          html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-        };
+      const opt = {
+        margin: 4,
+        filename: nombreArchivo,
+        image: { type: "jpeg", quality: 0.96 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      };
 
-        const pdfUri = await html2pdf().set(opt).from(contenedorUnico).outputPdf("datauristring");
-        wrapper.style.display = "none";
+      const pdfUri = await html2pdf().set(opt).from(contenedorUnico).outputPdf("datauristring");
+      wrapper.style.display = "none";
 
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: "completar_firma_tecnico",
-            idRegistro: item.idRegistro,
-            empresa: item.empresa,
-            nombreArchivo: nombreArchivo,
-            pdfUnificadoBase64: pdfUri.split(",")[1]
-          })
-        });
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "completar_firma_tecnico",
+          idRegistro: item.idRegistro,
+          empresa: item.empresa,
+          nombreArchivo: nombreArchivo,
+          pdfUnificadoBase64: pdfUri.split(",")[1]
+        })
+      });
 
-        const card = document.getElementById(`card-pendiente-${idx}`);
+      item.firmadoYa = true;
+      const card = document.getElementById(`card-pendiente-${idx}`);
+      if (card) {
         card.className = "p-4 rounded-2xl bg-emerald-100 border-2 border-emerald-500 text-emerald-950 text-xs font-bold text-center";
-        card.innerHTML = `✅ <strong>${item.trabajador}</strong> firmado y archivado en Google Drive (<strong>Registro de inducciones &gt; ${item.empresa}</strong>).`;
+        card.innerHTML = `✅ <strong>${item.trabajador}</strong> firmado y archivado en Drive (<strong>Registro de inducciones &gt; ${item.empresa}</strong>).`;
+      }
+    }
 
+    // Firma individual de una tarjeta
+    async function firmarIndividual(idx) {
+      if (!canvasEstado["canvas-firma-tecnico"]?.firmado) {
+        return alert("Estampa primero tu firma en el recuadro superior.");
+      }
+      const imgFirmaTecnico = document.getElementById("canvas-firma-tecnico").toDataURL("image/png");
+      const btn = document.getElementById(`btn-firmar-item-${idx}`);
+      btn.disabled = true;
+      btn.textContent = "⏳ Generando PDF y archivando...";
+
+      try {
+        await procesarYSubirUnTrabajador(idx, imgFirmaTecnico);
+        const restantes = pendientesActuales.filter(p => !p.firmadoYa).length;
+        const btnTodos = document.getElementById("btn-firmar-todos-golpe");
+        if (restantes > 0) {
+          btnTodos.textContent = `✍️ Firmar y Archivar TODOS de Golpe (${restantes} pendiente${restantes > 1 ? 's' : ''})`;
+        } else {
+          btnTodos.classList.add("hidden");
+        }
       } catch (e) {
-        wrapper.style.display = "none";
-        alert("Error al generar el PDF: " + e.message);
+        document.getElementById("wrapper-pdf-unico").style.display = "none";
+        alert("Error: " + e.message);
         btn.disabled = false;
-        btn.textContent = "✍️ Firmar y Archivar PDF Único en Drive";
+        btn.textContent = "✍️ Firmar Solo Este Trabajador";
+      }
+    }
+
+    // Firma masiva de TODOS los trabajadores APTOS pendientes de golpe
+    async function firmarTodosDeGolpe() {
+      if (!canvasEstado["canvas-firma-tecnico"]?.firmado) {
+        return alert("Estampa primero tu firma en el recuadro superior antes de firmar todos de golpe.");
+      }
+
+      const imgFirmaTecnico = document.getElementById("canvas-firma-tecnico").toDataURL("image/png");
+      const btnTodos = document.getElementById("btn-firmar-todos-golpe");
+      const progBox = document.getElementById("progreso-firma-masiva");
+
+      const indicesPendientes = pendientesActuales
+        .map((p, i) => (!p.firmadoYa ? i : -1))
+        .filter(i => i !== -1);
+
+      if (indicesPendientes.length === 0) return;
+
+      btnTodos.disabled = true;
+      progBox.classList.remove("hidden");
+
+      try {
+        for (let k = 0; k < indicesPendientes.length; k++) {
+          const idx = indicesPendientes[k];
+          progBox.textContent = `⏳ Procesando y archivando ${k + 1} de ${indicesPendientes.length}: ${pendientesActuales[idx].trabajador}...`;
+          await procesarYSubirUnTrabajador(idx, imgFirmaTecnico);
+        }
+
+        btnTodos.classList.add("hidden");
+        progBox.className = "p-3 rounded-xl bg-emerald-100 border border-emerald-500 text-emerald-950 text-xs font-black text-center";
+        progBox.textContent = `✅ ¡Listo! Se han firmado y archivado los ${indicesPendientes.length} expedientes en Google Drive.`;
+        cargarDatosIniciales();
+      } catch (e) {
+        document.getElementById("wrapper-pdf-unico").style.display = "none";
+        progBox.className = "p-3 rounded-xl bg-rose-100 border border-rose-400 text-rose-950 text-xs font-bold text-center";
+        progBox.textContent = "Error durante la firma masiva: " + e.message;
+        btnTodos.disabled = false;
       }
     }
 
