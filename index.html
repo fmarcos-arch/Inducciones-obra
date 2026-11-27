@@ -35,10 +35,9 @@
         </div>
       </div>
 
-      <!-- BOTÓN ÁREA TÉCNICO CON AVISO DE PENDIENTES -->
-      <button type="button" id="btn-modo-tecnico" onclick="alternarVistaTecnico()" class="relative text-[10px] font-black px-3 py-1.5 rounded-full bg-[#f25c19] hover:bg-[#d94d0e] text-white uppercase shadow transition flex items-center gap-1.5">
-        <span>Área Técnico PRL</span>
-        <span id="badge-avisos-pendientes" class="hidden bg-rose-600 text-white border border-white text-[10px] font-black px-1.5 py-0.2 rounded-full animate-pulse">0</span>
+      <!-- BOTÓN LIMPIO DE ACCESO PARA EL TÉCNICO PRL -->
+      <button type="button" id="btn-modo-tecnico" onclick="alternarVistaTecnico()" class="text-[10px] font-black px-3.5 py-1.5 rounded-full bg-[#f25c19] hover:bg-[#d94d0e] text-white uppercase shadow transition">
+        Área Técnico PRL
       </button>
     </div>
   </header>
@@ -168,7 +167,7 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- VISTA B: ÁREA TÉCNICO PRL (AVISOS Y FIRMA MASIVA)         -->
+    <!-- VISTA B: ÁREA TÉCNICO PRL (BANDEJA EXCLUSIVA DEL TÉCNICO) -->
     <!-- ========================================================= -->
     <div id="vista-tecnico" class="hidden space-y-4">
 
@@ -178,7 +177,7 @@
           <h2 class="text-base font-black text-[#0b2254] uppercase">Acceso Técnico PRL</h2>
           <button type="button" onclick="volverAVistaTrabajador()" class="text-xs font-bold text-slate-500 underline">Volver</button>
         </div>
-        <p class="text-xs text-slate-600">Inicia sesión con tu usuario para ver tus avisos pendientes y firmar todos los trabajadores APTOS de golpe.</p>
+        <p class="text-xs text-slate-600">Inicia sesión con tu usuario y contraseña para ver y firmar los exámenes APTOS que te han sido asignados.</p>
 
         <div class="space-y-3 text-xs">
           <div>
@@ -192,7 +191,7 @@
         </div>
 
         <button type="button" id="btn-login-tec" onclick="loginTecnicoPRL()" class="w-full bg-[#0b2254] text-white font-black py-3.5 rounded-xl text-xs uppercase shadow-lg">
-          Ver Avisos Pendientes de Firma
+          Entrar a Mi Bandeja de Firma
         </button>
         <p id="tec-login-error" class="hidden text-xs font-bold text-rose-600 text-center"></p>
       </section>
@@ -204,12 +203,12 @@
             <p class="text-[10px] text-amber-400 font-bold uppercase">Técnico PRL Conectado</p>
             <p id="nombre-tecnico-conectado" class="font-black text-sm"></p>
           </div>
-          <button type="button" onclick="volverAVistaTrabajador()" class="bg-slate-700 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase">
+          <button type="button" onclick="cerrarSesionTecnico()" class="bg-slate-700 hover:bg-rose-600 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase transition">
             Salir
           </button>
         </div>
 
-        <!-- RECUADRO DE FIRMA ÚNICA PARA APLICAR A TODOS -->
+        <!-- RECUADRO DE FIRMA ÚNICA PARA APLICAR A TODOS LOS SUYOS -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border-2 border-[#f25c19] space-y-3">
           <div class="flex justify-between text-xs font-black text-[#0b2254]">
             <span>Tu Firma Digital (Técnico PRL):</span>
@@ -217,9 +216,8 @@
           </div>
           <canvas id="canvas-firma-tecnico" class="w-full h-28 border-2 border-dashed border-slate-400 rounded-lg bg-slate-50 touch-canvas"></canvas>
 
-          <!-- BOTÓN DE FIRMA MASIVA PARA TODOS LOS APTOS -->
           <button type="button" id="btn-firmar-todos-golpe" onclick="firmarTodosDeGolpe()" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-xl text-xs uppercase tracking-wide shadow-lg transition">
-            ✍️ Firmar y Archivar TODOS de Golpe (0)
+            ✍️ Firmar y Archivar TODOS de Golpe
           </button>
 
           <div id="progreso-firma-masiva" class="hidden p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-950 text-xs font-bold text-center"></div>
@@ -258,9 +256,8 @@
     const canvasEstado = {};
     let listaTecnicosCache = [];
     let pendientesActuales = [];
-    let pendientesPorTecnicoMap = {};
 
-    // --- CARGA INICIAL DE TÉCNICOS, EMPRESAS Y AVISOS PENDIENTES ---
+    // --- CARGA INICIAL DE TÉCNICOS Y EMPRESAS (SIN MOSTRAR CONTADORES PÚBLICOS) ---
     async function cargarDatosIniciales() {
       renderizarSelectEmpresas([]);
       try {
@@ -271,33 +268,16 @@
             localStorage.setItem("elecnor_ind_empresas", JSON.stringify(data.empresas));
             renderizarSelectEmpresas(data.empresas);
           }
-          pendientesPorTecnicoMap = data.pendientesPorTecnico || {};
-          actualizarBadgeAvisos(data.totalPendientes || 0);
-
           if (Array.isArray(data.tecnicos)) {
             listaTecnicosCache = data.tecnicos;
             const selTec = document.getElementById("select-tecnico-prl");
             selTec.innerHTML = [
               `<option value="">-- Selecciona Técnico PRL --</option>`,
-              ...data.tecnicos.map(t => {
-                const nPend = pendientesPorTecnicoMap[t.usuario] || 0;
-                const etiqueta = nPend > 0 ? `${t.nombre} (${nPend} pendiente${nPend > 1 ? 's' : ''})` : t.nombre;
-                return `<option value="${t.usuario}">${etiqueta}</option>`;
-              })
+              ...data.tecnicos.map(t => `<option value="${t.usuario}">${t.nombre}</option>`)
             ].join("");
           }
         }
       } catch (e) {}
-    }
-
-    function actualizarBadgeAvisos(total) {
-      const badge = document.getElementById("badge-avisos-pendientes");
-      if (total > 0) {
-        badge.textContent = total;
-        badge.classList.remove("hidden");
-      } else {
-        badge.classList.add("hidden");
-      }
     }
 
     function renderizarSelectEmpresas(lista) {
@@ -454,7 +434,7 @@
       const tecnicoNombre = tecObj ? tecObj.nombre : tecUsuario;
 
       btnEnviar.disabled = true;
-      btnEnviar.textContent = "⏳ Registrando aviso para el Técnico PRL...";
+      btnEnviar.textContent = "⏳ Registrando examen para firma del Técnico PRL...";
 
       const payload = {
         action: "registrar_pendiente",
@@ -485,11 +465,10 @@
           box.className = "p-4 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-950 border-2 border-emerald-500 space-y-2";
           box.innerHTML = `
             <div class="text-sm font-black">✅ EXAMEN APTO (${aciertos} / 10 aciertos)</div>
-            <p>Tu inducción ha quedado registrada y enviada a la bandeja de firma de <strong>${tecnicoNombre}</strong>.</p>
+            <p>Tu inducción ha sido asignada exclusivamente a <strong>${tecnicoNombre}</strong> para su firma y registro en Drive.</p>
           `;
           box.classList.remove("hidden");
           document.getElementById("btn-siguiente-trabajador").classList.remove("hidden");
-          cargarDatosIniciales();
         } else {
           throw new Error(respData.message || "Error al guardar.");
         }
@@ -525,7 +504,7 @@
       volverAlActa();
     }
 
-    // --- ÁREA DEL TÉCNICO PRL (BANDEJA DE AVISOS Y FIRMA MASIVA) ---
+    // --- ÁREA DEL TÉCNICO PRL (SOLO SUS EXÁMENES ASIGNADOS) ---
     function alternarVistaTecnico() {
       document.getElementById("vista-trabajador").classList.add("hidden");
       document.getElementById("vista-tecnico").classList.remove("hidden");
@@ -534,7 +513,15 @@
     function volverAVistaTrabajador() {
       document.getElementById("vista-tecnico").classList.add("hidden");
       document.getElementById("vista-trabajador").classList.remove("hidden");
-      cargarDatosIniciales();
+    }
+
+    function cerrarSesionTecnico() {
+      document.getElementById("tec-usuario").value = "";
+      document.getElementById("tec-password").value = "";
+      pendientesActuales = [];
+      document.getElementById("panel-bandeja-tecnico").classList.add("hidden");
+      document.getElementById("panel-login-tecnico").classList.remove("hidden");
+      volverAVistaTrabajador();
     }
 
     async function loginTecnicoPRL() {
@@ -545,7 +532,7 @@
 
       if (!usuario || !password) return;
       btn.disabled = true;
-      btn.textContent = "Cargando avisos...";
+      btn.textContent = "Verificando...";
       err.classList.add("hidden");
 
       try {
@@ -560,7 +547,12 @@
           document.getElementById("panel-login-tecnico").classList.add("hidden");
           document.getElementById("panel-bandeja-tecnico").classList.remove("hidden");
           document.getElementById("nombre-tecnico-conectado").textContent = data.nombreTecnico;
-          pendientesActuales = (data.pendientes || []).map(p => ({ ...p, firmadoYa: false }));
+          document.getElementById("progreso-firma-masiva").classList.add("hidden");
+
+          // Doble filtro de seguridad: solo los exámenes asignados a este usuario técnico
+          pendientesActuales = (data.pendientes || [])
+            .filter(p => p.tecnicoUsuario === usuario)
+            .map(p => ({ ...p, firmadoYa: false }));
 
           setTimeout(() => inicializarCanvas("canvas-firma-tecnico"), 100);
           renderizarBandejaPendientes();
@@ -573,7 +565,7 @@
         err.classList.remove("hidden");
       } finally {
         btn.disabled = false;
-        btn.textContent = "Ver Avisos Pendientes de Firma";
+        btn.textContent = "Entrar a Mi Bandeja de Firma";
       }
     }
 
@@ -583,14 +575,15 @@
       const sinFirmar = pendientesActuales.filter(p => !p.firmadoYa);
 
       if (sinFirmar.length > 0) {
-        btnTodos.textContent = `✍️ Firmar y Archivar TODOS de Golpe (${sinFirmar.length} pendiente${sinFirmar.length > 1 ? 's' : ''})`;
+        btnTodos.textContent = `✍️ Firmar y Archivar TODOS de Golpe (${sinFirmar.length})`;
+        btnTodos.disabled = false;
         btnTodos.classList.remove("hidden");
       } else {
         btnTodos.classList.add("hidden");
       }
 
       if (pendientesActuales.length === 0) {
-        cont.innerHTML = `<div class="bg-white p-5 rounded-2xl text-center text-xs font-bold text-slate-500">No tienes trabajadores APTOS pendientes de firma.</div>`;
+        cont.innerHTML = `<div class="bg-white p-5 rounded-2xl text-center text-xs font-bold text-slate-500">No tienes exámenes APTOS asignados pendientes de firma.</div>`;
         return;
       }
 
@@ -824,7 +817,6 @@
       }
     }
 
-    // Firma individual de una tarjeta
     async function firmarIndividual(idx) {
       if (!canvasEstado["canvas-firma-tecnico"]?.firmado) {
         return alert("Estampa primero tu firma en el recuadro superior.");
@@ -839,7 +831,7 @@
         const restantes = pendientesActuales.filter(p => !p.firmadoYa).length;
         const btnTodos = document.getElementById("btn-firmar-todos-golpe");
         if (restantes > 0) {
-          btnTodos.textContent = `✍️ Firmar y Archivar TODOS de Golpe (${restantes} pendiente${restantes > 1 ? 's' : ''})`;
+          btnTodos.textContent = `✍️ Firmar y Archivar TODOS de Golpe (${restantes})`;
         } else {
           btnTodos.classList.add("hidden");
         }
@@ -851,7 +843,6 @@
       }
     }
 
-    // Firma masiva de TODOS los trabajadores APTOS pendientes de golpe
     async function firmarTodosDeGolpe() {
       if (!canvasEstado["canvas-firma-tecnico"]?.firmado) {
         return alert("Estampa primero tu firma en el recuadro superior antes de firmar todos de golpe.");
@@ -879,8 +870,7 @@
 
         btnTodos.classList.add("hidden");
         progBox.className = "p-3 rounded-xl bg-emerald-100 border border-emerald-500 text-emerald-950 text-xs font-black text-center";
-        progBox.textContent = `✅ ¡Listo! Se han firmado y archivado los ${indicesPendientes.length} expedientes en Google Drive.`;
-        cargarDatosIniciales();
+        progBox.textContent = `✅ ¡Listo! Se han firmado y archivado tus ${indicesPendientes.length} expedientes en Google Drive.`;
       } catch (e) {
         document.getElementById("wrapper-pdf-unico").style.display = "none";
         progBox.className = "p-3 rounded-xl bg-rose-100 border border-rose-400 text-rose-950 text-xs font-bold text-center";
