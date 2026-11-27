@@ -15,157 +15,83 @@
     .pill-f:checked + span { background-color: #dc2626; color: #fff; border-color: #b91c1c; font-weight: 800; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col text-slate-900">
+<body class="min-h-screen flex flex-col text-slate-900 pb-16">
 
-  <!-- PANTALLA DE LOGIN CORPORATIVA ELECNOR -->
-  <div id="pantalla-login" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#0b2254] via-[#0f172a] to-[#081636]">
-    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 border-t-4 border-[#f25c19] space-y-5">
-      <div class="text-center space-y-2">
-        <div class="inline-block bg-white px-4 py-2 rounded-xl">
-          <img src="logo-elecnor.png" alt="Elecnor" class="h-14 w-auto mx-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-          <svg viewBox="0 0 240 85" class="h-12 w-auto mx-auto hidden" xmlns="http://www.w3.org/2000/svg">
+  <!-- CABECERA ELECNOR -->
+  <header class="bg-[#0f172a] text-white p-3.5 shadow-lg sticky top-0 z-30">
+    <div class="max-w-lg mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div class="bg-white px-2.5 py-1.5 rounded-xl shadow shrink-0">
+          <img src="logo-elecnor.png" alt="Elecnor" class="h-6 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <svg viewBox="0 0 240 85" class="h-6 w-auto hidden" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 32 C65 4, 155 4, 175 26 C182 34, 165 42, 162 34 C158 24, 95 22, 12 32 Z" fill="#f25c19"/>
             <path d="M162 34 C168 48, 200 44, 228 24 C198 36, 175 36, 162 34 Z" fill="#f25c19"/>
             <text x="10" y="74" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="48" letter-spacing="-1" fill="#0b2254">elecnor</text>
           </svg>
         </div>
-        <h2 class="text-lg font-black text-[#0b2254] uppercase tracking-tight">Acceso Inducciones Elecnor</h2>
-        <p class="text-xs text-slate-500 font-medium">Control de Formación PRL y Test de Acceso a Obra</p>
-      </div>
-
-      <div class="space-y-3 text-xs">
         <div>
-          <label class="block text-[10px] font-bold text-[#0b2254] uppercase mb-1">Usuario Técnico / Formador</label>
-          <input type="text" id="login-usuario" placeholder="Tu usuario asignado" class="w-full p-3 border-2 border-slate-300 rounded-xl font-bold text-slate-900 focus:border-[#f25c19] focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-[10px] font-bold text-[#0b2254] uppercase mb-1">Contraseña</label>
-          <input type="password" id="login-password" placeholder="••••••••" class="w-full p-3 border-2 border-slate-300 rounded-xl font-bold text-slate-900 focus:border-[#f25c19] focus:outline-none" onkeydown="if(event.key==='Enter') intentarLogin()">
+          <p class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">PRL • FORMACIÓN DE OBRA</p>
+          <h1 class="font-black text-sm leading-tight uppercase">Inducción y Test Acceso</h1>
         </div>
       </div>
-
-      <button type="button" id="btn-entrar-login" onclick="intentarLogin()" class="w-full bg-[#f25c19] hover:bg-[#d94d0e] text-white font-black py-3.5 rounded-xl text-sm uppercase tracking-wide shadow-lg transition">
-        Entrar
+      <button type="button" id="btn-modo-tecnico" onclick="alternarVistaTecnico()" class="text-[10px] font-black px-3 py-1.5 rounded-full bg-[#f25c19] hover:bg-[#d94d0e] text-white uppercase shadow transition">
+        Área Técnico PRL
       </button>
-
-      <p id="login-mensaje-error" class="hidden text-center text-xs font-bold text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-200"></p>
     </div>
-  </div>
+  </header>
 
-  <!-- APLICACIÓN PRINCIPAL (OCULTA HASTA INICIAR SESIÓN) -->
-  <div id="contenedor-app-principal" class="hidden flex-col flex-1 pb-16">
+  <main class="max-w-lg mx-auto w-full p-3 space-y-4">
 
-    <!-- CABECERA ELECNOR -->
-    <header class="bg-[#0f172a] text-white p-3.5 shadow-lg sticky top-0 z-30">
-      <div class="max-w-lg mx-auto flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2.5">
-          <div class="bg-white px-2.5 py-1.5 rounded-xl shadow shrink-0">
-            <img src="logo-elecnor.png" alt="Elecnor" class="h-6 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <svg viewBox="0 0 240 85" class="h-6 w-auto hidden" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 32 C65 4, 155 4, 175 26 C182 34, 165 42, 162 34 C158 24, 95 22, 12 32 Z" fill="#f25c19"/>
-              <path d="M162 34 C168 48, 200 44, 228 24 C198 36, 175 36, 162 34 Z" fill="#f25c19"/>
-              <text x="10" y="74" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="48" letter-spacing="-1" fill="#0b2254">elecnor</text>
-            </svg>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">PRL • FORMACIÓN DE OBRA</p>
-            <h1 class="font-black text-sm leading-tight uppercase">Inducción y Test Trabajador</h1>
-          </div>
-        </div>
-        <div class="flex items-center gap-1.5 shrink-0">
-          <span id="badge-conexion" class="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-600 text-white uppercase">
-            Online
-          </span>
-          <button type="button" onclick="cerrarSesion()" class="text-[10px] font-black px-2.5 py-1 rounded-full bg-slate-700 hover:bg-rose-600 text-white uppercase transition">
-            Salir
-          </button>
-        </div>
-      </div>
-    </header>
+    <!-- ========================================================= -->
+    <!-- VISTA A: FLUJO DEL TRABAJADOR (ACTA + TEST)               -->
+    <!-- ========================================================= -->
+    <div id="vista-trabajador" class="space-y-4">
 
-    <main class="max-w-lg mx-auto w-full p-3 space-y-4">
-
-      <!-- BARRA DE PROGRESO DE FASES -->
+      <!-- BARRA DE PROGRESO -->
       <div class="grid grid-cols-2 gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200 text-center text-[11px] font-black uppercase">
-        <div id="tab-paso-1" class="py-2 px-3 rounded-xl bg-[#0b2254] text-white">
-          1. Acta de Inducción
-        </div>
-        <div id="tab-paso-2" class="py-2 px-3 rounded-xl bg-slate-100 text-slate-400">
-          2. Test de Examen
-        </div>
+        <div id="tab-paso-1" class="py-2 px-3 rounded-xl bg-[#0b2254] text-white">1. Registro y Firma</div>
+        <div id="tab-paso-2" class="py-2 px-3 rounded-xl bg-slate-100 text-slate-400">2. Test de Examen</div>
       </div>
 
-      <!-- ========================================================= -->
-      <!-- FASE 1: ACTA DE SESIÓN FORMATIVA (FI.ELN.GEN-04.01B)      -->
-      <!-- ========================================================= -->
+      <!-- PASO 1: DATOS DEL TRABAJADOR Y TÉCNICO QUE IMPARTE -->
       <div id="bloque-fase-1" class="space-y-4">
 
-        <!-- DATOS DE LA SESIÓN Y FORMADOR (PRERRELLENABLE POR TÉCNICO) -->
         <section class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-          <div class="bg-[#0f172a] text-white px-4 py-2.5 text-xs font-black uppercase tracking-wide flex justify-between items-center">
-            <span>Datos de la Sesión Formativa</span>
+          <div class="bg-[#0b2254] text-white px-4 py-2.5 text-xs font-black uppercase tracking-wide flex justify-between items-center">
+            <span>Temario de Inducción Impartido</span>
             <span class="text-[10px] text-amber-400">FI.ELN.GEN-04.01B</span>
+          </div>
+          <div class="p-4 text-[11px] text-slate-700 space-y-1.5 leading-relaxed">
+            <p>Formación PRL en el puesto de trabajo (<strong>Art. 19 Ley 31/95</strong>) para el proyecto <strong id="texto-proyecto-banner">FV HYBRID GECAMA</strong>:</p>
+            <p>• <strong>Normas HSE:</strong> Uso móvil, prohibido fumar, botiquín, extinción, drogas/alcohol, control de accesos.</p>
+            <p>• <strong>Riesgos y Seguridad:</strong> Líneas aéreas, EPIs, protecciones colectivas, distancia maquinaria, izados, cargas y equipos con marcado CE.</p>
+            <p>• <strong>Emergencias y Salud:</strong> Plan de emergencia (PAS), golpe de calor, productos químicos y charla pre-tarea.</p>
+          </div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-sm overflow-hidden border-2 border-[#f25c19]">
+          <div class="bg-[#f25c19] text-white px-4 py-2.5 text-xs font-black uppercase tracking-wide">
+            Datos del Trabajador y Técnico Formador
           </div>
           <div class="p-4 space-y-3 text-xs">
             <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase">Fecha Sesión *</label>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase">Fecha *</label>
                 <input type="date" id="ind-fecha" class="w-full mt-1 p-2 border border-slate-300 rounded-lg font-bold bg-slate-50">
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase">Duración Total *</label>
-                <input type="text" id="ind-duracion" value="1 Hora" class="w-full mt-1 p-2 border border-slate-300 rounded-lg font-bold bg-slate-50">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase">Proyecto / Obra *</label>
+                <input type="text" id="ind-proyecto" value="FV HYBRID GECAMA" oninput="document.getElementById('texto-proyecto-banner').textContent=this.value.toUpperCase()" class="w-full mt-1 p-2 border border-slate-300 rounded-lg font-bold bg-slate-50 uppercase">
               </div>
             </div>
 
             <div>
-              <label class="block text-[10px] font-bold text-slate-500 uppercase">Proyecto / Obra *</label>
-              <input type="text" id="ind-proyecto" value="FV HYBRID GECAMA" class="w-full mt-1 p-2 border border-slate-300 rounded-lg font-bold bg-slate-50 uppercase">
+              <label class="block text-[10px] font-bold text-[#0b2254] uppercase">Técnico PRL Elecnor que imparte la charla *</label>
+              <select id="select-tecnico-prl" class="w-full mt-1 p-2.5 border-2 border-[#0b2254] rounded-lg font-black uppercase bg-blue-50 text-[#0b2254]">
+                <option value="">Cargando técnicos PRL...</option>
+              </select>
             </div>
 
-            <div class="grid grid-cols-2 gap-2.5">
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase">Formador / Técnico PRL *</label>
-                <input type="text" id="ind-formador" placeholder="Nombre y Apellidos" class="w-full mt-1 p-2 border border-slate-300 rounded-lg font-bold bg-white">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase">Categoría Formador *</label>
-                <input type="text" id="ind-cat-formador" value="Técnico PRL" class="w-full mt-1 p-2 border border-slate-300 rounded-lg font-bold bg-white">
-              </div>
-            </div>
-
-            <!-- FIRMA DEL FORMADOR (SE CONSERVA ENTRE TRABAJADORES) -->
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
-              <div class="flex justify-between text-[10px] font-bold text-slate-600">
-                <span>Firma del Formador (se mantiene para varios trabajadores):</span>
-                <button type="button" onclick="limpiarCanvas('canvas-formador')" class="text-rose-600 underline">Borrar</button>
-              </div>
-              <canvas id="canvas-formador" class="w-full h-24 border-2 border-dashed border-slate-400 rounded-lg bg-white touch-canvas"></canvas>
-            </div>
-          </div>
-        </section>
-
-        <!-- TEMARIO IMPARTIDO (ART. 19 LEY 31/95) -->
-        <section class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-          <div class="bg-[#0b2254] text-white px-4 py-2.5 text-xs font-black uppercase tracking-wide">
-            Temas Tratados (Art. 19 Ley 31/95 PRL)
-          </div>
-          <div class="p-4 text-[11px] text-slate-700 space-y-2 leading-relaxed">
-            <p><strong>• Normas generales HSE en el proyecto:</strong> Uso móvil, prohibido fumar, botiquín, medios de extinción, prohibido consumo de drogas y alcohol, control de accesos.</p>
-            <p><strong>• Interferencia líneas aéreas:</strong> Trabajos próximos tensión, cruces, riesgos.</p>
-            <p><strong>• Plan de Seguridad y Salud:</strong> Equipos de protección individual, protecciones colectivas, señalización, procedimientos de trabajo específico (distancia seguridad respecto a maquinaria, izados, cargas y descargas de material, movimiento de tierras, montaje de estructura, manipulación de cargas, etc.).</p>
-            <p><strong>• Equipos de trabajo:</strong> Marcado CE, grupos electrógenos, prohibido escaleras, alargaderas, herramientas en buen estado.</p>
-            <p><strong>• Plan de Emergencia:</strong> Tipos de emergencia, accidentes e incidentes, respuesta y comunicación de emergencias, números de emergencia, PAS, suspensión de trabajos.</p>
-            <p><strong>• Otros riesgos específicos:</strong> Golpe de calor, manipulación de productos químicos, charla pre-tarea, checklist de maquinaria y charlas semanales.</p>
-          </div>
-        </section>
-
-        <!-- DATOS DEL TRABAJADOR Y FIRMA -->
-        <section class="bg-white rounded-2xl shadow-sm overflow-hidden border-2 border-[#f25c19]">
-          <div class="bg-[#f25c19] text-white px-4 py-2.5 text-xs font-black uppercase tracking-wide">
-            Datos del Trabajador y Firma de Asistencia
-          </div>
-          <div class="p-4 space-y-3 text-xs">
             <div>
               <label class="block text-[10px] font-bold text-slate-500 uppercase">Apellidos y Nombre del Trabajador *</label>
               <input type="text" id="trab-nombre" placeholder="Ej. GARCÍA LÓPEZ, JUAN" class="w-full mt-1 p-2.5 border-2 border-slate-300 rounded-lg font-bold uppercase bg-white">
@@ -177,17 +103,17 @@
                 <input type="text" id="trab-dni" placeholder="Ej. 12345678Z" class="w-full mt-1 p-2.5 border-2 border-slate-300 rounded-lg font-black uppercase bg-white">
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase">Puesto / Categoría *</label>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase">Puesto de Trabajo *</label>
                 <input type="text" id="trab-puesto" placeholder="Ej. Montador / Oficial" class="w-full mt-1 p-2.5 border-2 border-slate-300 rounded-lg font-bold uppercase bg-white">
               </div>
             </div>
 
             <div>
-              <label class="block text-[10px] font-bold text-slate-500 uppercase">Empresa (Carpeta en Drive) *</label>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase">Empresa *</label>
               <select id="trab-empresa-select" onchange="gestionarCambioEmpresa()" class="w-full mt-1 p-2.5 border-2 border-slate-300 rounded-lg font-bold uppercase bg-white">
                 <option value="">Cargando empresas...</option>
               </select>
-              <input type="text" id="trab-empresa-otra" placeholder="Escribe nombre de nueva empresa..." class="hidden w-full mt-1.5 p-2.5 border-2 border-amber-500 rounded-lg font-bold uppercase bg-amber-50">
+              <input type="text" id="trab-empresa-otra" placeholder="Escribe el nombre de tu empresa..." class="hidden w-full mt-1.5 p-2.5 border-2 border-amber-500 rounded-lg font-bold uppercase bg-amber-50">
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
@@ -199,70 +125,112 @@
             </div>
 
             <button type="button" onclick="pasarAlTestExamen()" class="w-full bg-[#0b2254] hover:bg-[#0f172a] text-white font-black py-4 rounded-xl text-sm uppercase tracking-wide shadow-lg transition">
-              ✍️ Confirmar Firma y Pasar al Test de Examen →
+              ✍️ Firmar Asistencia y Pasar al Test →
             </button>
           </div>
         </section>
-
       </div>
 
-      <!-- ========================================================= -->
-      <!-- FASE 2: TEST DE INDUCCIÓN (10 PREGUNTAS V / F)            -->
-      <!-- ========================================================= -->
+      <!-- PASO 2: TEST DE EXAMEN ONLINE -->
       <div id="bloque-fase-2" class="hidden space-y-4">
-
-        <!-- RESUMEN DE DATOS DEL TRABAJADOR PRECARGADOS -->
-        <section class="bg-[#0b2254] text-white rounded-2xl p-4 shadow-sm space-y-1.5 text-xs">
+        <section class="bg-[#0b2254] text-white rounded-2xl p-4 shadow-sm space-y-1 text-xs">
           <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-            <span class="font-black text-amber-400 uppercase">Test de Inducción Online</span>
-            <button type="button" onclick="volverAlActa()" class="text-[10px] bg-slate-700 px-2.5 py-1 rounded font-bold uppercase">
-              ← Volver al Acta
-            </button>
+            <span class="font-black text-amber-400 uppercase">Test de Inducción (10 Preguntas)</span>
+            <button type="button" onclick="volverAlActa()" class="text-[10px] bg-slate-700 px-2.5 py-1 rounded font-bold uppercase">← Volver</button>
           </div>
-          <p><strong>Trabajador:</strong> <span id="resumen-trab-nombre"></span></p>
-          <p><strong>DNI / NIE:</strong> <span id="resumen-trab-dni"></span> • <strong>Puesto:</strong> <span id="resumen-trab-puesto"></span></p>
-          <p><strong>Empresa:</strong> <span id="resumen-trab-empresa"></span></p>
-          <p class="text-[11px] text-slate-300 pt-1">Selecciona <strong>Verdadero (V)</strong> o <strong>Falso (F)</strong> en cada una de las 10 preguntas.</p>
+          <p><strong>Trabajador:</strong> <span id="resumen-trab-nombre"></span> (<span id="resumen-trab-dni"></span>)</p>
+          <p><strong>Empresa:</strong> <span id="resumen-trab-empresa"></span> • <strong>Puesto:</strong> <span id="resumen-trab-puesto"></span></p>
         </section>
 
-        <!-- CUESTIONARIO DE 10 PREGUNTAS -->
         <section class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-          <div class="bg-[#0f172a] text-white px-4 py-2.5 text-xs font-black uppercase tracking-wide">
-            Cuestionario de Evaluación (10 Preguntas)
-          </div>
           <div id="contenedor-preguntas-test" class="divide-y divide-slate-200 px-4"></div>
         </section>
 
-        <!-- BOTÓN FINALIZAR Y GUARDAR EXPEDIENTE -->
         <section class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 space-y-3">
-          <button type="button" id="btn-finalizar-test" onclick="finalizarYGenerarDocumentos()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-xl text-sm uppercase tracking-wide shadow-lg transition">
-            ✅ Finalizar Test, Generar PDFs y Guardar
+          <button type="button" id="btn-enviar-test-trabajador" onclick="enviarTestTrabajador()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-xl text-sm uppercase tracking-wide shadow-lg transition">
+            ✅ Finalizar y Enviar Examen
           </button>
 
-          <div id="estado-guardado-box" class="hidden p-4 rounded-xl text-xs font-bold text-center space-y-2.5"></div>
+          <div id="resultado-trabajador-box" class="hidden p-4 rounded-xl text-xs font-bold text-center space-y-2"></div>
 
-          <button type="button" id="btn-nuevo-trabajador" onclick="reiniciarParaNuevoTrabajador()" class="hidden w-full bg-[#f25c19] hover:bg-[#d94d0e] text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wide shadow">
-            ➕ Registrar Siguiente Trabajador
+          <button type="button" id="btn-reintentar-test" onclick="reintentarTest()" class="hidden w-full bg-amber-500 text-slate-950 font-black py-3 rounded-xl text-xs uppercase">
+            🔄 Repetir Test de Examen
+          </button>
+
+          <button type="button" id="btn-siguiente-trabajador" onclick="reiniciarFormularioTrabajador()" class="hidden w-full bg-[#0b2254] text-white font-black py-3.5 rounded-xl text-xs uppercase">
+            ➕ Siguiente Trabajador
           </button>
         </section>
-
       </div>
+    </div>
 
-    </main>
-  </div>
+    <!-- ========================================================= -->
+    <!-- VISTA B: ÁREA TÉCNICO PRL (VALIDACIÓN Y FIRMA DE PDF)     -->
+    <!-- ========================================================= -->
+    <div id="vista-tecnico" class="hidden space-y-4">
 
-  <!-- CONTENEDORES OCULTOS PARA GENERACIÓN DE LOS DOS PDFs -->
-  <div id="wrapper-pdf" style="display:none; background:#fff; padding:10px;">
-    <div id="render-pdf-acta" style="width:740px; margin:0 auto; background:#fff; color:#111; padding:14px; font-family:Arial, Helvetica, sans-serif;"></div>
-    <div id="render-pdf-test" style="width:740px; margin:0 auto; background:#fff; color:#111; padding:14px; font-family:Arial, Helvetica, sans-serif;"></div>
+      <!-- LOGIN DEL TÉCNICO -->
+      <section id="panel-login-tecnico" class="bg-white rounded-2xl shadow-xl p-5 border-t-4 border-[#f25c19] space-y-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-base font-black text-[#0b2254] uppercase">Validación Técnico PRL</h2>
+          <button type="button" onclick="volverAVistaTrabajador()" class="text-xs font-bold text-slate-500 underline">Cerrar</button>
+        </div>
+        <p class="text-xs text-slate-600">Introduce tu usuario y contraseña para firmar las inducciones pendientes y archivarlas en Google Drive.</p>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-[10px] font-bold text-[#0b2254] uppercase mb-1">Usuario Técnico</label>
+            <input type="text" id="tec-usuario" class="w-full p-3 border-2 border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-[#0b2254] uppercase mb-1">Contraseña</label>
+            <input type="password" id="tec-password" class="w-full p-3 border-2 border-slate-300 rounded-xl font-bold" onkeydown="if(event.key==='Enter') loginTecnicoPRL()">
+          </div>
+        </div>
+
+        <button type="button" id="btn-login-tec" onclick="loginTecnicoPRL()" class="w-full bg-[#0b2254] text-white font-black py-3.5 rounded-xl text-xs uppercase shadow-lg">
+          Acceder a Pendientes de Firma
+        </button>
+        <p id="tec-login-error" class="hidden text-xs font-bold text-rose-600 text-center"></p>
+      </section>
+
+      <!-- BANDEJA DE PENDIENTES Y FIRMA DEL TÉCNICO -->
+      <section id="panel-bandeja-tecnico" class="hidden space-y-4">
+        <div class="bg-[#0b2254] text-white p-4 rounded-2xl flex justify-between items-center">
+          <div>
+            <p class="text-[10px] text-amber-400 font-bold uppercase">Técnico PRL Conectado</p>
+            <p id="nombre-tecnico-conectado" class="font-black text-sm"></p>
+          </div>
+          <button type="button" onclick="volverAVistaTrabajador()" class="bg-slate-700 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase">
+            Salir Área Técnico
+          </button>
+        </div>
+
+        <!-- FIRMA DEL TÉCNICO (SIRVE PARA FIRMAR LOS PENDIENTES) -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border-2 border-[#f25c19] space-y-2">
+          <div class="flex justify-between text-xs font-black text-[#0b2254]">
+            <span>Tu Firma Digital (Técnico PRL):</span>
+            <button type="button" onclick="limpiarCanvas('canvas-firma-tecnico')" class="text-rose-600 underline text-[11px]">Borrar</button>
+          </div>
+          <canvas id="canvas-firma-tecnico" class="w-full h-28 border-2 border-dashed border-slate-400 rounded-lg bg-slate-50 touch-canvas"></canvas>
+          <p class="text-[10px] text-slate-500">Estampa tu firma arriba y pulsa <strong>"Firmar y Archivar PDF Único en Drive"</strong> en cada trabajador aprobado.</p>
+        </div>
+
+        <div id="lista-pendientes-tecnico" class="space-y-3"></div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- CONTENEDOR OCULTO PARA EL PDF ÚNICO DE 2 PÁGINAS (ACTA + TEST) -->
+  <div id="wrapper-pdf-unico" style="display:none; background:#fff; padding:0;">
+    <div id="render-pdf-completo" style="width:740px; margin:0 auto; background:#fff; color:#111; font-family:Arial, Helvetica, sans-serif;"></div>
   </div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcOl7izY8xLhjD_91uaPL6AVhPyVbwATPQBPjEQcwtjIRBTHQVTvRkI-n4ttTfrrlO/exec";
-
-    // Nota mínima para aprobar (cambia a 3 si quieres aplicar el mínimo literal de 3/10)
     const NOTA_MINIMA_APROBADO = 8;
-
     const EMPRESAS_BASE = ["ELECNOR", "BARAHONA"];
 
     const PREGUNTAS_TEST = [
@@ -279,77 +247,37 @@
     ];
 
     const canvasEstado = {};
+    let listaTecnicosCache = [];
+    let pendientesActuales = [];
+    let idRegistroEnlaceCorreo = new URLSearchParams(window.location.search).get("firmar") || "";
 
-    // --- LOGIN ---
-    function verificarSesionActiva() {
-      const sesion = sessionStorage.getItem("elecnor_induccion_user");
-      if (sesion) desbloquearApp(sesion);
-    }
-
-    async function intentarLogin() {
-      const usuario = document.getElementById("login-usuario").value.trim();
-      const password = document.getElementById("login-password").value.trim();
-      const errBox = document.getElementById("login-mensaje-error");
-      const btn = document.getElementById("btn-entrar-login");
-
-      if (!usuario || !password) {
-        errBox.textContent = "Introduce usuario y contraseña.";
-        errBox.classList.remove("hidden");
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = "Verificando...";
-      errBox.classList.add("hidden");
-
+    // --- CARGA INICIAL DE TÉCNICOS Y EMPRESAS ---
+    async function cargarDatosIniciales() {
+      renderizarSelectEmpresas([]);
       try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "login", usuario: usuario, password: password })
-        });
+        const res = await fetch(SCRIPT_URL);
         const data = await res.json();
-
         if (data.status === "ok") {
-          const nombreMostrar = data.nombre || usuario;
-          sessionStorage.setItem("elecnor_induccion_user", nombreMostrar);
-          desbloquearApp(nombreMostrar);
-        } else {
-          errBox.textContent = data.message || "Usuario o contraseña incorrectos.";
-          errBox.classList.remove("hidden");
+          if (Array.isArray(data.empresas)) {
+            localStorage.setItem("elecnor_ind_empresas", JSON.stringify(data.empresas));
+            renderizarSelectEmpresas(data.empresas);
+          }
+          if (Array.isArray(data.tecnicos)) {
+            listaTecnicosCache = data.tecnicos;
+            const selTec = document.getElementById("select-tecnico-prl");
+            selTec.innerHTML = [
+              `<option value="">-- Selecciona Técnico PRL --</option>`,
+              ...data.tecnicos.map(t => `<option value="${t.usuario}">${t.nombre}</option>`)
+            ].join("");
+          }
         }
-      } catch (e) {
-        errBox.textContent = "Error de conexión con el servidor.";
-        errBox.classList.remove("hidden");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Entrar";
+      } catch (e) {}
+
+      if (idRegistroEnlaceCorreo) {
+        alternarVistaTecnico();
       }
     }
 
-    function desbloquearApp(nombreFormador) {
-      document.getElementById("pantalla-login").classList.add("hidden");
-      const app = document.getElementById("contenedor-app-principal");
-      app.classList.remove("hidden");
-      app.classList.add("flex");
-
-      const campoFormador = document.getElementById("ind-formador");
-      if (campoFormador && !campoFormador.value) {
-        campoFormador.value = nombreFormador;
-      }
-
-      setTimeout(() => {
-        inicializarCanvas("canvas-formador");
-        inicializarCanvas("canvas-trabajador");
-      }, 100);
-    }
-
-    function cerrarSesion() {
-      sessionStorage.removeItem("elecnor_induccion_user");
-      location.reload();
-    }
-
-    // --- GESTIÓN DE EMPRESAS ---
     function renderizarSelectEmpresas(lista) {
       const sel = document.getElementById("trab-empresa-select");
       const guardadasLocal = JSON.parse(localStorage.getItem("elecnor_ind_empresas") || "[]");
@@ -360,19 +288,6 @@
         ...unicas.map(emp => `<option value="${emp}">${emp}</option>`),
         `<option value="__OTRA__">+ REGISTRAR NUEVA EMPRESA...</option>`
       ].join("");
-    }
-
-    async function cargarEmpresasDesdeDrive() {
-      renderizarSelectEmpresas([]);
-      if (!navigator.onLine || !SCRIPT_URL.startsWith("http")) return;
-      try {
-        const res = await fetch(SCRIPT_URL);
-        const json = await res.json();
-        if (json && Array.isArray(json.empresas)) {
-          localStorage.setItem("elecnor_ind_empresas", JSON.stringify(json.empresas));
-          renderizarSelectEmpresas(json.empresas);
-        }
-      } catch (e) {}
     }
 
     function gestionarCambioEmpresa() {
@@ -403,13 +318,13 @@
       return sel.trim().toUpperCase();
     }
 
-    // --- PANELES DE FIRMA ---
+    // --- CANVAS DE FIRMA ---
     function inicializarCanvas(id) {
       const c = document.getElementById(id);
       if (!c) return;
       const rect = c.getBoundingClientRect();
       c.width = rect.width || 320;
-      c.height = rect.height || 110;
+      c.height = rect.height || 115;
       const ctx = c.getContext("2d");
       ctx.lineWidth = 2.5;
       ctx.lineCap = "round";
@@ -438,10 +353,9 @@
       if (canvasEstado[id]) canvasEstado[id].firmado = false;
     }
 
-    // --- NAVEGACIÓN ENTRE ACTA Y TEST ---
+    // --- FLUJO DEL TRABAJADOR ---
     function renderizarPreguntasTest() {
-      const cont = document.getElementById("contenedor-preguntas-test");
-      cont.innerHTML = PREGUNTAS_TEST.map((p, idx) => `
+      document.getElementById("contenedor-preguntas-test").innerHTML = PREGUNTAS_TEST.map((p, idx) => `
         <div class="py-3.5 space-y-2">
           <p class="text-xs font-bold text-slate-800 leading-snug">${idx + 1}. ${p.texto}</p>
           <div class="grid grid-cols-2 gap-2.5">
@@ -459,21 +373,15 @@
     }
 
     function pasarAlTestExamen() {
-      const formador = document.getElementById("ind-formador").value.trim();
+      const tecUsuario = document.getElementById("select-tecnico-prl").value;
       const nombre = document.getElementById("trab-nombre").value.trim().toUpperCase();
       const dni = document.getElementById("trab-dni").value.trim().toUpperCase();
       const puesto = document.getElementById("trab-puesto").value.trim().toUpperCase();
       const empresa = obtenerEmpresaSeleccionada();
 
-      if (!formador || !canvasEstado["canvas-formador"]?.firmado) {
-        return alert("El técnico/formador debe indicar su nombre y firmar la sesión antes de pasar al trabajador.");
-      }
-      if (!nombre || !dni || !puesto || !empresa) {
-        return alert("Por favor, rellena todos los datos del trabajador: Nombre y Apellidos, DNI, Puesto y Empresa.");
-      }
-      if (!canvasEstado["canvas-trabajador"]?.firmado) {
-        return alert("El trabajador debe firmar en el recuadro antes de pasar al test.");
-      }
+      if (!tecUsuario) return alert("Selecciona el Técnico PRL de Elecnor que ha impartido la charla.");
+      if (!nombre || !dni || !puesto || !empresa) return alert("Completa Nombre y Apellidos, DNI, Puesto y Empresa.");
+      if (!canvasEstado["canvas-trabajador"]?.firmado) return alert("Debes firmar con el dedo antes de pasar al examen.");
 
       document.getElementById("resumen-trab-nombre").textContent = nombre;
       document.getElementById("resumen-trab-dni").textContent = dni;
@@ -494,6 +402,179 @@
       document.getElementById("tab-paso-2").className = "py-2 px-3 rounded-xl bg-slate-100 text-slate-400";
     }
 
+    async function enviarTestTrabajador() {
+      let aciertos = 0;
+      const respuestas = [];
+
+      for (let i = 0; i < PREGUNTAS_TEST.length; i++) {
+        const sel = document.querySelector(`input[name="preg_${i}"]:checked`);
+        if (!sel) return alert(`Falta responder la pregunta ${i + 1}.`);
+        respuestas.push(sel.value);
+        if (sel.value === PREGUNTAS_TEST[i].correcta) aciertos++;
+      }
+
+      const box = document.getElementById("resultado-trabajador-box");
+      const btnEnviar = document.getElementById("btn-enviar-test-trabajador");
+
+      if (aciertos < NOTA_MINIMA_APROBADO) {
+        box.className = "p-4 rounded-xl text-xs font-bold text-center bg-rose-100 text-rose-950 border-2 border-rose-500 space-y-1.5";
+        box.innerHTML = `
+          <div class="text-sm font-black">⛔ NO APTO (${aciertos} / 10 aciertos)</div>
+          <p>No has alcanzado la puntuación mínima. Revisa los puntos de la inducción y repite el test.</p>
+        `;
+        box.classList.remove("hidden");
+        document.getElementById("btn-reintentar-test").classList.remove("hidden");
+        return;
+      }
+
+      const tecUsuario = document.getElementById("select-tecnico-prl").value;
+      const tecObj = listaTecnicosCache.find(t => t.usuario === tecUsuario);
+      const tecnicoNombre = tecObj ? tecObj.nombre : tecUsuario;
+
+      btnEnviar.disabled = true;
+      btnEnviar.textContent = "⏳ Enviando notificación al Técnico PRL...";
+
+      const payload = {
+        action: "registrar_pendiente",
+        fecha: document.getElementById("ind-fecha").value,
+        proyecto: document.getElementById("ind-proyecto").value.trim().toUpperCase(),
+        empresa: obtenerEmpresaSeleccionada(),
+        trabajador: document.getElementById("trab-nombre").value.trim().toUpperCase(),
+        dni: document.getElementById("trab-dni").value.trim().toUpperCase(),
+        puesto: document.getElementById("trab-puesto").value.trim().toUpperCase(),
+        aciertos: aciertos,
+        respuestas: respuestas,
+        firmaTrabajador: document.getElementById("canvas-trabajador").toDataURL("image/png"),
+        tecnicoUsuario: tecUsuario,
+        tecnicoNombre: tecnicoNombre,
+        appUrl: window.location.origin + window.location.pathname
+      };
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        btnEnviar.classList.add("hidden");
+        document.getElementById("btn-reintentar-test").classList.add("hidden");
+        box.className = "p-4 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-950 border-2 border-emerald-500 space-y-2";
+        box.innerHTML = `
+          <div class="text-sm font-black">✅ EXAMEN APTO (${aciertos} / 10 aciertos)</div>
+          <p>Se ha enviado un correo electrónico a <strong>${tecnicoNombre}</strong> para que estampe su firma y el documento quede registrado en Drive.</p>
+        `;
+        box.classList.remove("hidden");
+        document.getElementById("btn-siguiente-trabajador").classList.remove("hidden");
+      } catch (e) {
+        alert("Error de red al enviar el examen. Inténtalo de nuevo.");
+        btnEnviar.disabled = false;
+        btnEnviar.textContent = "✅ Finalizar y Enviar Examen";
+      }
+    }
+
+    function reintentarTest() {
+      renderizarPreguntasTest();
+      document.getElementById("resultado-trabajador-box").classList.add("hidden");
+      document.getElementById("btn-reintentar-test").classList.add("hidden");
+    }
+
+    function reiniciarFormularioTrabajador() {
+      document.getElementById("trab-nombre").value = "";
+      document.getElementById("trab-dni").value = "";
+      document.getElementById("trab-puesto").value = "";
+      limpiarCanvas("canvas-trabajador");
+      renderizarPreguntasTest();
+
+      const btnEnviar = document.getElementById("btn-enviar-test-trabajador");
+      btnEnviar.disabled = false;
+      btnEnviar.textContent = "✅ Finalizar y Enviar Examen";
+      btnEnviar.classList.remove("hidden");
+
+      document.getElementById("resultado-trabajador-box").classList.add("hidden");
+      document.getElementById("btn-siguiente-trabajador").classList.add("hidden");
+      volverAlActa();
+    }
+
+    // --- ÁREA DEL TÉCNICO PRL (LOGIN + FIRMA DEL PDF UNIFICADO) ---
+    function alternarVistaTecnico() {
+      document.getElementById("vista-trabajador").classList.add("hidden");
+      document.getElementById("vista-tecnico").classList.remove("hidden");
+    }
+
+    function volverAVistaTrabajador() {
+      document.getElementById("vista-tecnico").classList.add("hidden");
+      document.getElementById("vista-trabajador").classList.remove("hidden");
+    }
+
+    async function loginTecnicoPRL() {
+      const usuario = document.getElementById("tec-usuario").value.trim();
+      const password = document.getElementById("tec-password").value.trim();
+      const err = document.getElementById("tec-login-error");
+      const btn = document.getElementById("btn-login-tec");
+
+      if (!usuario || !password) return;
+      btn.disabled = true;
+      btn.textContent = "Verificando...";
+      err.classList.add("hidden");
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "login_y_pendientes", usuario: usuario, password: password })
+        });
+        const data = await res.json();
+
+        if (data.status === "ok") {
+          document.getElementById("panel-login-tecnico").classList.add("hidden");
+          document.getElementById("panel-bandeja-tecnico").classList.remove("hidden");
+          document.getElementById("nombre-tecnico-conectado").textContent = data.nombreTecnico;
+          pendientesActuales = data.pendientes || [];
+
+          setTimeout(() => inicializarCanvas("canvas-firma-tecnico"), 100);
+          renderizarBandejaPendientes();
+        } else {
+          err.textContent = data.message || "Credenciales incorrectas.";
+          err.classList.remove("hidden");
+        }
+      } catch (e) {
+        err.textContent = "Error al conectar con Google Sheets.";
+        err.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Acceder a Pendientes de Firma";
+      }
+    }
+
+    function renderizarBandejaPendientes() {
+      const cont = document.getElementById("lista-pendientes-tecnico");
+      if (pendientesActuales.length === 0) {
+        cont.innerHTML = `<div class="bg-white p-5 rounded-2xl text-center text-xs font-bold text-slate-500">No tienes inducciones pendientes de firma en este momento.</div>`;
+        return;
+      }
+
+      cont.innerHTML = pendientesActuales.map((item, idx) => {
+        const destacado = item.idRegistro === idRegistroEnlaceCorreo ? "border-2 border-emerald-500 bg-emerald-50/40" : "border border-slate-200 bg-white";
+        return `
+          <div id="card-pendiente-${idx}" class="${destacado} p-4 rounded-2xl shadow-sm space-y-2.5 text-xs">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase">APTO (${item.aciertos}/10)</span>
+                <h3 class="font-black text-sm text-slate-900 mt-1">${item.trabajador}</h3>
+                <p class="text-[11px] text-slate-600">DNI: <strong>${item.dni}</strong> • Puesto: <strong>${item.puesto}</strong></p>
+                <p class="text-[11px] text-slate-600">Empresa: <strong>${item.empresa}</strong> • Fecha: ${item.fecha}</p>
+              </div>
+            </div>
+            <button type="button" id="btn-firmar-item-${idx}" onclick="firmarYGenerarPDFUnico(${idx})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs uppercase shadow">
+              ✍️ Firmar y Archivar PDF Único en Drive
+            </button>
+          </div>
+        `;
+      }).join("");
+    }
+
     function limpiarTextoArchivo(str) {
       return String(str || "")
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -502,308 +583,231 @@
         .replace(/^_+|_+$/g, "");
     }
 
-    // --- GENERACIÓN DE LOS DOS PDFs Y ENVÍO A DRIVE / EXCEL ---
-    async function finalizarYGenerarDocumentos() {
-      let aciertos = 0;
-      const respuestas = [];
-
-      for (let i = 0; i < PREGUNTAS_TEST.length; i++) {
-        const sel = document.querySelector(`input[name="preg_${i}"]:checked`);
-        if (!sel) {
-          return alert(`Falta responder la pregunta número ${i + 1} del test.`);
-        }
-        const val = sel.value;
-        respuestas.push(val);
-        if (val === PREGUNTAS_TEST[i].correcta) aciertos++;
+    // --- GENERACIÓN DE UN ÚNICO PDF DE 2 PÁGINAS (PÁG 1: ACTA | PÁG 2: TEST) ---
+    async function firmarYGenerarPDFUnico(idx) {
+      if (!canvasEstado["canvas-firma-tecnico"]?.firmado) {
+        return alert("Por favor, estampa primero tu firma en el recuadro superior antes de validar al trabajador.");
       }
 
-      const aprobado = aciertos >= NOTA_MINIMA_APROBADO;
-      const resultadoTexto = aprobado ? "APTO" : "NO APTO";
+      const item = pendientesActuales[idx];
+      const imgFirmaTecnico = document.getElementById("canvas-firma-tecnico").toDataURL("image/png");
+      const btn = document.getElementById(`btn-firmar-item-${idx}`);
+      btn.disabled = true;
+      btn.textContent = "⏳ Generando PDF unificado y subiendo a Drive...";
 
-      const fecha = document.getElementById("ind-fecha").value;
-      const duracion = document.getElementById("ind-duracion").value.trim();
-      const proyecto = document.getElementById("ind-proyecto").value.trim().toUpperCase();
-      const formador = document.getElementById("ind-formador").value.trim().toUpperCase();
-      const catFormador = document.getElementById("ind-cat-formador").value.trim();
-
-      const nombre = document.getElementById("trab-nombre").value.trim().toUpperCase();
-      const dni = document.getElementById("trab-dni").value.trim().toUpperCase();
-      const puesto = document.getElementById("trab-puesto").value.trim().toUpperCase();
-      const empresa = obtenerEmpresaSeleccionada();
-
-      const imgFirmaFormador = document.getElementById("canvas-formador").toDataURL("image/png");
-      const imgFirmaTrabajador = document.getElementById("canvas-trabajador").toDataURL("image/png");
-
-      // 1. PLANTILLA HTML DEL ACTA DE SESIÓN FORMATIVA (FI.ELN.GEN-04.01B)
-      const elActa = document.getElementById("render-pdf-acta");
-      elActa.innerHTML = `
-        <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:10px;">
-          <tr>
-            <td style="border:1.5px solid #0b2254; padding:8px; width:25%; text-align:center;">
-              <div style="font-size:22px; font-weight:900; color:#0b2254;">elecnor</div>
-            </td>
-            <td style="border:1.5px solid #0b2254; padding:8px; width:50%; text-align:center;">
-              <div style="font-size:14px; font-weight:900; color:#0b2254;">ACTA DE SESIÓN FORMATIVA</div>
-              <div style="font-size:9px; color:#444; margin-top:2px;">PROYECTO: <strong>${proyecto}</strong></div>
-            </td>
-            <td style="border:1.5px solid #0b2254; padding:8px; width:25%; text-align:center; font-size:9.5px;">
-              <div><strong>FI.ELN.GEN-04.01B</strong></div>
-              <div>Rev. 01</div>
-              <div style="margin-top:3px;">Fecha: <strong>${fecha}</strong></div>
-            </td>
-          </tr>
-        </table>
-
-        <p style="font-size:10px; margin-bottom:8px; line-height:1.4;">
-          Formación en materia de prevención de riesgos laborales en el puesto de trabajo tal y como se establece en el <strong>art. 19 de la Ley 31/95 de prevención de riesgos laborales</strong>.
-        </p>
-
-        <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:10px;">
-          <tr style="background:#0b2254; color:#fff;">
-            <th style="border:1px solid #333; padding:5px; width:36%;">APELLIDOS Y NOMBRE DEL TRABAJADOR</th>
-            <th style="border:1px solid #333; padding:5px; width:22%;">EMPRESA</th>
-            <th style="border:1px solid #333; padding:5px; width:20%;">CATEGORÍA / PUESTO</th>
-            <th style="border:1px solid #333; padding:5px; width:22%;">FIRMA</th>
-          </tr>
-          <tr>
-            <td style="border:1px solid #333; padding:6px; font-weight:bold;">${nombre}<br><span style="font-size:8.5px; font-weight:normal;">DNI/NIE: ${dni}</span></td>
-            <td style="border:1px solid #333; padding:6px; text-align:center; font-weight:bold;">${empresa}</td>
-            <td style="border:1px solid #333; padding:6px; text-align:center;">${puesto}</td>
-            <td style="border:1px solid #333; padding:4px; text-align:center;"><img src="${imgFirmaTrabajador}" style="height:44px; margin:0 auto;"></td>
-          </tr>
-        </table>
-
-        <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:9.5px;">
-          <tr style="background:#0b2254; color:#fff;">
-            <th style="border:1px solid #333; padding:5px; text-align:left;">TEMAS TRATADOS:</th>
-          </tr>
-          <tr>
-            <td style="border:1px solid #333; padding:8px; line-height:1.45;">
-              <p style="margin:0 0 5px 0;"><strong>• Normas generales HSE en el proyecto:</strong> Uso móvil, prohibido fumar, botiquín, medios de extinción, prohibido consumo de drogas y alcohol, control de accesos.</p>
-              <p style="margin:0 0 5px 0;"><strong>• Interferencia líneas aéreas:</strong> Trabajos próximos tensión, cruces, riesgos.</p>
-              <p style="margin:0 0 5px 0;"><strong>• Plan de Seguridad y Salud:</strong> Equipos de protección individual, protecciones colectivas, señalización, procedimientos de trabajo específico: distancia seguridad respecto a maquinaria, izados, cargas y descargas de material, movimiento de tierras, montaje de estructura, manipulación de cargas, etc.</p>
-              <p style="margin:0 0 5px 0;"><strong>• Equipos de trabajo:</strong> Marcado CE, grupos electrógenos, prohibido escaleras, alargaderas, herramientas en buen estado.</p>
-              <p style="margin:0 0 5px 0;"><strong>• Plan de Emergencia:</strong> Tipos de emergencia, accidentes e incidentes, respuesta y comunicación de emergencias. Números de emergencia, PAS, suspensión de trabajos.</p>
-              <p style="margin:0 0 5px 0;"><strong>• Otros:</strong> Golpe de Calor, manipulación de productos químicos.</p>
-              <p style="margin:0;"><strong>• Seguimiento:</strong> Charla pre-tarea y checklist de maquinaria, charlas formación e información semanales.</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="border:1px solid #333; padding:6px;"><strong>DURACIÓN TOTAL DE LA SESIÓN:</strong> ${duracion}</td>
-          </tr>
-        </table>
-
-        <table style="width:100%; border-collapse:collapse; margin-bottom:8px; font-size:10px;">
-          <tr style="background:#0b2254; color:#fff;">
-            <th style="border:1px solid #333; padding:5px; width:45%;">NOMBRE Y APELLIDOS DE LOS RESPONSABLES DE IMPARTIR LA SESIÓN</th>
-            <th style="border:1px solid #333; padding:5px; width:25%;">CATEGORÍA</th>
-            <th style="border:1px solid #333; padding:5px; width:30%;">FIRMA</th>
-          </tr>
-          <tr>
-            <td style="border:1px solid #333; padding:6px; font-weight:bold;">${formador}</td>
-            <td style="border:1px solid #333; padding:6px; text-align:center;">${catFormador}</td>
-            <td style="border:1px solid #333; padding:4px; text-align:center;"><img src="${imgFirmaFormador}" style="height:44px; margin:0 auto;"></td>
-          </tr>
-        </table>
-
-        <table style="width:100%; border-collapse:collapse; font-size:9.5px;">
-          <tr>
-            <td style="border:1px solid #333; padding:5px; width:50%;"><strong>S.G. / DIRECCIÓN / FILIAL:</strong> Elecnor Servicios y Proyectos</td>
-            <td style="border:1px solid #333; padding:5px; width:50%;"><strong>FECHA:</strong> ${fecha}</td>
-          </tr>
-          <tr>
-            <td style="border:1px solid #333; padding:5px;"><strong>DELEGACIÓN / OBRA:</strong> ${proyecto}</td>
-            <td style="border:1px solid #333; padding:5px;"><strong>NOTA:</strong> Copia al Servicio de Prevención.</td>
-          </tr>
-        </table>
-      `;
-
-      // 2. PLANTILLA HTML DEL TEST DE INDUCCIÓN
       const filasTestHTML = PREGUNTAS_TEST.map((p, i) => `
         <tr>
           <td style="border:1px solid #333; padding:5px 6px; font-size:9.5px;"><strong>${i + 1}.</strong> ${p.texto}</td>
-          <td style="border:1px solid #333; padding:5px; text-align:center; font-weight:bold; font-size:11px; width:8%;">${respuestas[i] === "V" ? "X" : ""}</td>
-          <td style="border:1px solid #333; padding:5px; text-align:center; font-weight:bold; font-size:11px; width:8%;">${respuestas[i] === "F" ? "X" : ""}</td>
+          <td style="border:1px solid #333; padding:5px; text-align:center; font-weight:bold; font-size:11px; width:8%;">${item.respuestas[i] === "V" ? "X" : ""}</td>
+          <td style="border:1px solid #333; padding:5px; text-align:center; font-weight:bold; font-size:11px; width:8%;">${item.respuestas[i] === "F" ? "X" : ""}</td>
         </tr>
       `).join("");
 
-      const elTest = document.getElementById("render-pdf-test");
-      elTest.innerHTML = `
-        <table style="width:100%; border-collapse:collapse; margin-bottom:8px; font-size:10px;">
-          <tr>
-            <td style="border:1.5px solid #0b2254; padding:8px; width:25%; text-align:center;">
-              <div style="font-size:22px; font-weight:900; color:#0b2254;">elecnor</div>
-            </td>
-            <td style="border:1.5px solid #0b2254; padding:8px; width:50%; text-align:center;">
-              <div style="font-size:15px; font-weight:900; color:#0b2254;">TEST DE INDUCCIÓN</div>
-              <div style="font-size:9px; color:#555; margin-top:2px;">EVALUACIÓN DE CONOCIMIENTOS PRL EN OBRA</div>
-            </td>
-            <td style="border:1.5px solid #0b2254; padding:8px; width:25%; text-align:center;">
-              <div style="font-size:9.5px;">FECHA: <strong>${fecha}</strong></div>
-              <div style="margin-top:4px;">
-                <span style="background:${aprobado ? '#059669' : '#dc2626'}; color:#fff; font-weight:bold; padding:3px 8px; border-radius:4px; font-size:10px;">
-                  ${resultadoTexto} (${aciertos}/10)
-                </span>
-              </div>
-            </td>
-          </tr>
-        </table>
+      const contenedorUnico = document.getElementById("render-pdf-completo");
+      contenedorUnico.innerHTML = `
+        <!-- PÁGINA 1: ACTA DE SESIÓN FORMATIVA -->
+        <div style="padding:14px;">
+          <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:10px;">
+            <tr>
+              <td style="border:1.5px solid #0b2254; padding:8px; width:25%; text-align:center;">
+                <div style="font-size:22px; font-weight:900; color:#0b2254;">elecnor</div>
+              </td>
+              <td style="border:1.5px solid #0b2254; padding:8px; width:50%; text-align:center;">
+                <div style="font-size:14px; font-weight:900; color:#0b2254;">ACTA DE SESIÓN FORMATIVA</div>
+                <div style="font-size:9px; color:#444; margin-top:2px;">PROYECTO: <strong>${item.proyecto}</strong></div>
+              </td>
+              <td style="border:1.5px solid #0b2254; padding:8px; width:25%; text-align:center; font-size:9.5px;">
+                <div><strong>FI.ELN.GEN-04.01B</strong></div>
+                <div>Rev. 01</div>
+                <div style="margin-top:3px;">Fecha: <strong>${item.fecha}</strong></div>
+              </td>
+            </tr>
+          </table>
 
-        <table style="width:100%; border-collapse:collapse; margin-bottom:8px; font-size:10px;">
-          <tr>
-            <td style="border:1px solid #333; padding:5px 7px; width:55%;"><strong>PROYECTO:</strong> ${proyecto}</td>
-            <td style="border:1px solid #333; padding:5px 7px; width:45%;"><strong>EMPRESA:</strong> ${empresa}</td>
-          </tr>
-          <tr>
-            <td style="border:1px solid #333; padding:5px 7px;"><strong>NOMBRE Y APELLIDOS:</strong> ${nombre}</td>
-            <td style="border:1px solid #333; padding:5px 7px;"><strong>DNI:</strong> ${dni}</td>
-          </tr>
-          <tr>
-            <td style="border:1px solid #333; padding:5px 7px;"><strong>CATEGORÍA PROFESIONAL:</strong> ${puesto}</td>
-            <td style="border:1px solid #333; padding:5px 7px; text-align:center;">
-              <strong>FIRMA TRABAJADOR:</strong><br>
-              <img src="${imgFirmaTrabajador}" style="height:40px; margin:2px auto 0 auto;">
-            </td>
-          </tr>
-        </table>
+          <p style="font-size:10px; margin-bottom:8px; line-height:1.4;">
+            Formación en materia de prevención de riesgos laborales en el puesto de trabajo tal y como se establece en el <strong>art. 19 de la Ley 31/95 de prevención de riesgos laborales</strong>.
+          </p>
 
-        <div style="font-size:9.5px; background:#f8fafc; border:1px solid #cbd5e1; padding:6px 8px; margin-bottom:8px; line-height:1.35;">
-          La prueba consta de 10 preguntas con dos posibles opciones: verdadero (V) y falso (F). Lea atentamente cada pregunta y conteste en la casilla correspondiente.<br>
-          <strong>Resultado obtenido: ${aciertos} aciertos de 10 preguntas (${resultadoTexto}).</strong>
+          <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:10px;">
+            <tr style="background:#0b2254; color:#fff;">
+              <th style="border:1px solid #333; padding:5px; width:36%;">APELLIDOS Y NOMBRE DEL TRABAJADOR</th>
+              <th style="border:1px solid #333; padding:5px; width:22%;">EMPRESA</th>
+              <th style="border:1px solid #333; padding:5px; width:20%;">CATEGORÍA / PUESTO</th>
+              <th style="border:1px solid #333; padding:5px; width:22%;">FIRMA</th>
+            </tr>
+            <tr>
+              <td style="border:1px solid #333; padding:6px; font-weight:bold;">${item.trabajador}<br><span style="font-size:8.5px; font-weight:normal;">DNI/NIE: ${item.dni}</span></td>
+              <td style="border:1px solid #333; padding:6px; text-align:center; font-weight:bold;">${item.empresa}</td>
+              <td style="border:1px solid #333; padding:6px; text-align:center;">${item.puesto}</td>
+              <td style="border:1px solid #333; padding:4px; text-align:center;"><img src="${item.firmaTrabajador}" style="height:44px; margin:0 auto;"></td>
+            </tr>
+          </table>
+
+          <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:9.5px;">
+            <tr style="background:#0b2254; color:#fff;">
+              <th style="border:1px solid #333; padding:5px; text-align:left;">TEMAS TRATADOS:</th>
+            </tr>
+            <tr>
+              <td style="border:1px solid #333; padding:8px; line-height:1.45;">
+                <p style="margin:0 0 5px 0;"><strong>• Normas generales HSE en el proyecto:</strong> Uso móvil, prohibido fumar, botiquín, medios de extinción, prohibido consumo de drogas y alcohol, control de accesos.</p>
+                <p style="margin:0 0 5px 0;"><strong>• Interferencia líneas aéreas:</strong> Trabajos próximos tensión, cruces, riesgos.</p>
+                <p style="margin:0 0 5px 0;"><strong>• Plan de Seguridad y Salud:</strong> Equipos de protección individual, protecciones colectivas, señalización, procedimientos de trabajo específico: distancia seguridad respecto a maquinaria, izados, cargas y descargas de material, movimiento de tierras, montaje de estructura, manipulación de cargas, etc.</p>
+                <p style="margin:0 0 5px 0;"><strong>• Equipos de trabajo:</strong> Marcado CE, grupos electrógenos, prohibido escaleras, alargaderas, herramientas en buen estado.</p>
+                <p style="margin:0 0 5px 0;"><strong>• Plan de Emergencia:</strong> Tipos de emergencia, accidentes e incidentes, respuesta y comunicación de emergencias. Números de emergencia, PAS, suspensión de trabajos.</p>
+                <p style="margin:0 0 5px 0;"><strong>• Otros:</strong> Golpe de Calor, manipulación de productos químicos.</p>
+                <p style="margin:0;"><strong>• Seguimiento:</strong> Charla pre-tarea y checklist de maquinaria, charlas formación e información semanales.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #333; padding:6px;"><strong>DURACIÓN TOTAL DE LA SESIÓN:</strong> 1 Hora</td>
+            </tr>
+          </table>
+
+          <table style="width:100%; border-collapse:collapse; margin-bottom:8px; font-size:10px;">
+            <tr style="background:#0b2254; color:#fff;">
+              <th style="border:1px solid #333; padding:5px; width:45%;">NOMBRE Y APELLIDOS DE LOS RESPONSABLES DE IMPARTIR LA SESIÓN</th>
+              <th style="border:1px solid #333; padding:5px; width:25%;">CATEGORÍA</th>
+              <th style="border:1px solid #333; padding:5px; width:30%;">FIRMA</th>
+            </tr>
+            <tr>
+              <td style="border:1px solid #333; padding:6px; font-weight:bold;">${item.tecnicoNombre}</td>
+              <td style="border:1px solid #333; padding:6px; text-align:center;">Técnico PRL</td>
+              <td style="border:1px solid #333; padding:4px; text-align:center;"><img src="${imgFirmaTecnico}" style="height:44px; margin:0 auto;"></td>
+            </tr>
+          </table>
+
+          <table style="width:100%; border-collapse:collapse; font-size:9.5px;">
+            <tr>
+              <td style="border:1px solid #333; padding:5px; width:50%;"><strong>S.G. / DIRECCIÓN / FILIAL:</strong> Elecnor Servicios y Proyectos</td>
+              <td style="border:1px solid #333; padding:5px; width:50%;"><strong>FECHA:</strong> ${item.fecha}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #333; padding:5px;"><strong>DELEGACIÓN / OBRA:</strong> ${item.proyecto}</td>
+              <td style="border:1px solid #333; padding:5px;"><strong>NOTA:</strong> Copia al Servicio de Prevención.</td>
+            </tr>
+          </table>
         </div>
 
-        <table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
-          <thead>
-            <tr style="background:#0b2254; color:#fff; font-size:10px;">
-              <th style="border:1px solid #333; padding:5px 6px; text-align:left;">CUESTIONARIO</th>
-              <th style="border:1px solid #333; padding:5px; text-align:center; width:8%;">V</th>
-              <th style="border:1px solid #333; padding:5px; text-align:center; width:8%;">F</th>
-            </tr>
-          </thead>
-          <tbody>${filasTestHTML}</tbody>
-        </table>
+        <!-- SALTO DE PÁGINA PARA EL TEST -->
+        <div style="page-break-before: always;"></div>
 
-        <table style="width:100%; border-collapse:collapse; font-size:9.5px;">
-          <tr>
-            <td style="border:1px solid #333; padding:6px; width:50%;"><strong>CORREGIDO POR FORMADOR ELECNOR:</strong> ${formador}</td>
-            <td style="border:1px solid #333; padding:4px; width:50%; text-align:center;">
-              <img src="${imgFirmaFormador}" style="height:36px; margin:0 auto;">
-            </td>
-          </tr>
-        </table>
+        <!-- PÁGINA 2: TEST DE INDUCCIÓN -->
+        <div style="padding:14px;">
+          <table style="width:100%; border-collapse:collapse; margin-bottom:8px; font-size:10px;">
+            <tr>
+              <td style="border:1.5px solid #0b2254; padding:8px; width:25%; text-align:center;">
+                <div style="font-size:22px; font-weight:900; color:#0b2254;">elecnor</div>
+              </td>
+              <td style="border:1.5px solid #0b2254; padding:8px; width:50%; text-align:center;">
+                <div style="font-size:15px; font-weight:900; color:#0b2254;">TEST DE INDUCCIÓN</div>
+                <div style="font-size:9px; color:#555; margin-top:2px;">EVALUACIÓN DE CONOCIMIENTOS PRL EN OBRA</div>
+              </td>
+              <td style="border:1.5px solid #0b2254; padding:8px; width:25%; text-align:center;">
+                <div style="font-size:9.5px;">FECHA: <strong>${item.fecha}</strong></div>
+                <div style="margin-top:4px;">
+                  <span style="background:#059669; color:#fff; font-weight:bold; padding:3px 8px; border-radius:4px; font-size:10px;">
+                    APTO (${item.aciertos}/10)
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <table style="width:100%; border-collapse:collapse; margin-bottom:8px; font-size:10px;">
+            <tr>
+              <td style="border:1px solid #333; padding:5px 7px; width:55%;"><strong>PROYECTO:</strong> ${item.proyecto}</td>
+              <td style="border:1px solid #333; padding:5px 7px; width:45%;"><strong>EMPRESA:</strong> ${item.empresa}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #333; padding:5px 7px;"><strong>NOMBRE Y APELLIDOS:</strong> ${item.trabajador}</td>
+              <td style="border:1px solid #333; padding:5px 7px;"><strong>DNI:</strong> ${item.dni}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #333; padding:5px 7px;"><strong>CATEGORÍA PROFESIONAL:</strong> ${item.puesto}</td>
+              <td style="border:1px solid #333; padding:5px 7px; text-align:center;">
+                <strong>FIRMA TRABAJADOR:</strong><br>
+                <img src="${item.firmaTrabajador}" style="height:40px; margin:2px auto 0 auto;">
+              </td>
+            </tr>
+          </table>
+
+          <div style="font-size:9.5px; background:#f8fafc; border:1px solid #cbd5e1; padding:6px 8px; margin-bottom:8px; line-height:1.35;">
+            La prueba consta de 10 preguntas con dos posibles opciones: verdadero (V) y falso (F). Lea atentamente cada pregunta y conteste en la casilla correspondiente.<br>
+            <strong>Resultado obtenido: ${item.aciertos} aciertos de 10 preguntas (APTO).</strong>
+          </div>
+
+          <table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
+            <thead>
+              <tr style="background:#0b2254; color:#fff; font-size:10px;">
+                <th style="border:1px solid #333; padding:5px 6px; text-align:left;">CUESTIONARIO</th>
+                <th style="border:1px solid #333; padding:5px; text-align:center; width:8%;">V</th>
+                <th style="border:1px solid #333; padding:5px; text-align:center; width:8%;">F</th>
+              </tr>
+            </thead>
+            <tbody>${filasTestHTML}</tbody>
+          </table>
+
+          <table style="width:100%; border-collapse:collapse; font-size:9.5px;">
+            <tr>
+              <td style="border:1px solid #333; padding:6px; width:50%;"><strong>VALIDADO Y FIRMADO POR TÉCNICO PRL ELECNOR:</strong> ${item.tecnicoNombre}</td>
+              <td style="border:1px solid #333; padding:4px; width:50%; text-align:center;">
+                <img src="${imgFirmaTecnico}" style="height:36px; margin:0 auto;">
+              </td>
+            </tr>
+          </table>
+        </div>
       `;
 
-      const btn = document.getElementById("btn-finalizar-test");
-      const box = document.getElementById("estado-guardado-box");
-      btn.disabled = true;
-      btn.textContent = "⏳ Generando PDFs y subiendo a Drive...";
-
-      const nombreLimpio = limpiarTextoArchivo(nombre);
-      const empresaLimpia = limpiarTextoArchivo(empresa);
-      const nombreArchivoActa = `${fecha}_${empresaLimpia}_${nombreLimpio}_ACTA_INDUCCION.pdf`;
-      const nombreArchivoTest = `${fecha}_${empresaLimpia}_${nombreLimpio}_TEST_INDUCCION.pdf`;
-
-      const wrapper = document.getElementById("wrapper-pdf");
+      const wrapper = document.getElementById("wrapper-pdf-unico");
       wrapper.style.display = "block";
-      elTest.style.display = "none";
+
+      const nombreArchivo = `${item.fecha}_${limpiarTextoArchivo(item.empresa)}_${limpiarTextoArchivo(item.trabajador)}_INDUCCION_Y_TEST.pdf`;
 
       try {
         await new Promise(r => setTimeout(r, 150));
 
-        // Generar PDF 1: Acta de Sesión Formativa
-        const optActa = {
-          margin: 5,
-          filename: nombreArchivoActa,
+        const opt = {
+          margin: 4,
+          filename: nombreArchivo,
           image: { type: "jpeg", quality: 0.96 },
           html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
         };
-        const pdfActaUri = await html2pdf().set(optActa).from(elActa).outputPdf("datauristring");
 
-        // Generar PDF 2: Test de Inducción
-        elActa.style.display = "none";
-        elTest.style.display = "block";
-        await new Promise(r => setTimeout(r, 150));
-
-        const optTest = {
-          margin: 5,
-          filename: nombreArchivoTest,
-          image: { type: "jpeg", quality: 0.96 },
-          html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-        };
-        const pdfTestUri = await html2pdf().set(optTest).from(elTest).outputPdf("datauristring");
-
+        const pdfUri = await html2pdf().set(opt).from(contenedorUnico).outputPdf("datauristring");
         wrapper.style.display = "none";
-        elActa.style.display = "block";
-
-        // Enviar ambos PDFs al servidor (Google Drive + Google Sheets)
-        const payload = {
-          proyecto: proyecto,
-          empresa: empresa,
-          trabajador: nombre,
-          dni: dni,
-          puesto: puesto,
-          aciertos: aciertos,
-          resultado: resultadoTexto,
-          formador: formador,
-          nombreArchivoActa: nombreArchivoActa,
-          pdfActaBase64: pdfActaUri.split(",")[1],
-          nombreArchivoTest: nombreArchivoTest,
-          pdfTestBase64: pdfTestUri.split(",")[1]
-        };
 
         await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            action: "completar_firma_tecnico",
+            idRegistro: item.idRegistro,
+            empresa: item.empresa,
+            nombreArchivo: nombreArchivo,
+            pdfUnificadoBase64: pdfUri.split(",")[1]
+          })
         });
 
-        renderizarSelectEmpresas([empresa]);
+        const card = document.getElementById(`card-pendiente-${idx}`);
+        card.className = "p-4 rounded-2xl bg-emerald-100 border-2 border-emerald-500 text-emerald-950 text-xs font-bold text-center";
+        card.innerHTML = `✅ <strong>${item.trabajador}</strong> firmado y archivado en Google Drive (<strong>Registro de inducciones &gt; ${item.empresa}</strong>).`;
 
-        box.className = aprobado
-          ? "p-4 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-950 border-2 border-emerald-500 space-y-2"
-          : "p-4 rounded-xl text-xs font-bold text-center bg-rose-100 text-rose-950 border-2 border-rose-500 space-y-2";
-
-        box.innerHTML = `
-          <div class="text-sm font-black">${aprobado ? "✅ TEST SUPERADO: APTO" : "⛔ TEST NO SUPERADO: NO APTO"} (${aciertos} / 10 aciertos)</div>
-          <p class="text-[11px] font-medium">Se han generado y guardado ambos documentos (Acta de Inducción y Test) en Google Drive dentro de:<br><strong>Registro de inducciones &gt; ${empresa}</strong></p>
-        `;
-        box.classList.remove("hidden");
-        document.getElementById("btn-nuevo-trabajador").classList.remove("hidden");
-
-      } catch (err) {
+      } catch (e) {
         wrapper.style.display = "none";
-        elActa.style.display = "block";
-        box.className = "p-3 rounded-xl text-xs font-bold text-center bg-rose-100 text-rose-900 border border-rose-400";
-        box.textContent = "Error al procesar los documentos: " + err.message;
-        box.classList.remove("hidden");
-      } finally {
+        alert("Error al generar el PDF: " + e.message);
         btn.disabled = false;
-        btn.textContent = "✅ Finalizar Test, Generar PDFs y Guardar";
+        btn.textContent = "✍️ Firmar y Archivar PDF Único en Drive";
       }
     }
 
-    function reiniciarParaNuevoTrabajador() {
-      document.getElementById("trab-nombre").value = "";
-      document.getElementById("trab-dni").value = "";
-      document.getElementById("trab-puesto").value = "";
-      limpiarCanvas("canvas-trabajador");
-      renderizarPreguntasTest();
-
-      document.getElementById("estado-guardado-box").classList.add("hidden");
-      document.getElementById("btn-nuevo-trabajador").classList.add("hidden");
-      volverAlActa();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    // Inicialización
+    // --- INICIO ---
     const hoy = new Date();
     document.getElementById("ind-fecha").value = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
     renderizarPreguntasTest();
-    cargarEmpresasDesdeDrive();
-    verificarSesionActiva();
+    inicializarCanvas("canvas-trabajador");
+    cargarDatosIniciales();
   </script>
 </body>
 </html>
